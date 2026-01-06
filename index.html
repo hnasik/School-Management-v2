@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>School Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ===== KEEP EVERYTHING SAME (NO REMOVAL) ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, Segoe UI, sans-serif; }
+    body { 
+      background: linear-gradient(135deg, #0a1929, #1a2a4a, #0a1929); 
+      min-height: 100vh; 
+      color: #333;
+      position: relative;
+    }
+    
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+      z-index: -1;
+    }
+    
+    .hidden { display: none !important; }
+    #app { display: flex; min-height: 100vh; }
+
+    .sidebar { 
+      width: 220px; 
+      background: rgba(10, 25, 41, 0.95); 
+      padding: 2rem 1rem; 
+      overflow-y: auto;
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+    
+    .sidebar h2 {
+      color: #fff;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      text-align: center;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .nav-link { 
+      display: flex; 
+      gap: 10px; 
+      padding: .8rem 1rem; 
+      margin-bottom: .5rem; 
+      border-radius: 12px; 
+      color: rgba(255, 255, 255, 0.7); 
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .nav-link::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 3px;
+      background: linear-gradient(to bottom, #3498db, #2980b9);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .nav-link:hover {
+      background: rgba(52, 152, 219, 0.2);
+      color: #fff;
+      transform: translateX(3px);
+    }
+    
+    .nav-link:hover::before {
+      transform: translateX(0);
+    }
+    
+    
+
+    .main { 
+      flex: 1; 
+      padding: 2rem; 
+      overflow-y: auto;
+    }
+
+    .topbar { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      background: rgba(10, 25, 41, 0.95); 
+      padding: 1.5rem 2rem; 
+      border-radius: 20px; 
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      animation: fadeInDown 0.6s ease;
+    }
+    
+    .topbar h2 {
+      color: #fff;
+      font-size: 1.8rem;
+      position: relative;
+      padding-left: 15px;
+    }
+    
+    .topbar h2::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 70%;
+      width: 5px;
+      background: linear-gradient(to bottom, #3498db, #2980b9);
+      border-radius: 3px;
+    }
+    
+    .topbar select {
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(10, 25, 41, 0.8);
+      color: #fff;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .topbar select:hover {
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+    
+    #page-welcome {
+      color: #fff;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      background: rgba(52, 152, 219, 0.2);
+      border-radius: 10px;
+    }
+
+    .card-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); 
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .card { 
+      padding: 1.5rem; 
+      border-radius: 20px; 
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.6s ease;
+    }
+    
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+    
+    .card:hover::before {
+      transform: translateX(0);
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-students { 
+      background: linear-gradient(135deg,#1e3c72,#2a5298);
+    }
+    
+    .card-teachers { 
+      background: linear-gradient(135deg,#0f3460,#16213e);
+    }
+    
+    .card-payments { 
+      background: linear-gradient(135deg,#1e3c72,#0f3460);
+    }
+    
+    .card-value { 
+      font-size: 1.8rem; 
+      font-weight: bold;
+      margin-top: 0.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .card i {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      font-size: 2.5rem;
+      opacity: 0.2;
+    }
+
+    .section-chart {
+      margin-top: 2rem;
+      background: linear-gradient(135deg,#1e3c72,#0f3460);
+      color: #fff;
+      padding: 1.5rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      animation: fadeInUp 0.8s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .section-chart::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+      animation: rotate 30s linear infinite;
+    }
+    
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .section-chart h3 {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 1rem;
+    }
+    
+    #monthly-bar-year-label {
+      position: relative;
+      z-index: 1;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 0.5rem;
+    }
+
+    .monthly-bar-chart {
+      display: flex;
+      align-items: flex-end;
+      height: 260px;
+      gap: 16px;
+      margin-top: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .bar-item { 
+      flex: 1; 
+      height: 100%; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: flex-end; 
+      align-items: center;
+      position: relative;
+    }
+    
+    .bar { 
+      width: 70%; 
+      border-radius: 8px 8px 0 0; 
+      min-height: 6px;
+      position: relative;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Different colors for each month */
+    .bar-item:nth-child(1) .bar { background: #FF6B6B; } /* January - Red */
+    .bar-item:nth-child(2) .bar { background: #4ECDC4; } /* February - Teal */
+    .bar-item:nth-child(3) .bar { background: #45B7D1; } /* March - Blue */
+    .bar-item:nth-child(4) .bar { background: #96CEB4; } /* April - Green */
+    .bar-item:nth-child(5) .bar { background: #FFEAA7; } /* May - Yellow */
+    .bar-item:nth-child(6) .bar { background: #DDA0DD; } /* June - Plum */
+    .bar-item:nth-child(7) .bar { background: #98D8C8; } /* July - Mint */
+    .bar-item:nth-child(8) .bar { background: #FFB6C1; } /* August - Light Pink */
+    .bar-item:nth-child(9) .bar { background: #87CEEB; } /* September - Sky Blue */
+    .bar-item:nth-child(10) .bar { background: #F4A460; } /* October - Sandy Brown */
+    .bar-item:nth-child(11) .bar { background: #9370DB; } /* November - Medium Purple */
+    .bar-item:nth-child(12) .bar { background: #20B2AA; } /* December - Light Sea Green */
+    
+    .bar::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to top, rgba(255, 255, 255, 0.3), transparent);
+      border-radius: 8px 8px 0 0;
+    }
+    
+    .bar-item:hover .bar {
+      transform: scaleY(1.05);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    }
+    
+    .bar-amount { 
+      font-size: .8rem; 
+      margin-top: .3rem; 
+      color: #fff;
+      font-weight: 500;
+    }
+    
+    .bar-month { 
+      font-size: .75rem; 
+      opacity: .85;
+      margin-top: 0.3rem;
+    }
+
+    /* ===== NEW (SMALL, SAFE ADDITION) ===== */
+    .class-wise-summary {
+      margin-top: 1.5rem;
+      background: rgba(255,255,255,.15);
+      padding: 1rem;
+      border-radius: 12px;
+      position: relative;
+      z-index: 1;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .class-wise-summary h4 {
+      margin-bottom: .8rem;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .class-wise-summary h4::before {
+      content: "";
+      width: 4px;
+      height: 20px;
+      background: white;
+      border-radius: 2px;
+    }
+
+    .class-wise-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
+      gap: .6rem;
+      font-size: .85rem;
+    }
+
+    .class-item {
+      background: rgba(255,255,255,.2);
+      padding: .4rem .6rem;
+      border-radius: 8px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .class-item:hover {
+      background: rgba(255,255,255,.3);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Animations */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 60px;
+        padding: 1rem 0.5rem;
+      }
+      
+      .sidebar h2 {
+        font-size: 0;
+        margin-bottom: 1rem;
+      }
+      
+      .sidebar h2 i {
+        font-size: 1.5rem;
+        display: block;
+        text-align: center;
+      }
+      
+      .nav-link span {
+        display: none;
+      }
+      
+      .nav-link {
+        justify-content: center;
+        padding: 0.8rem;
+      }
+      
+      .topbar {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div id="app" class="hidden">
+  <aside class="sidebar">
+    <h2><i class="fas fa-school"></i> School Panel</h2>
+    <a class="nav-link" href="index.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+ <a href="student.html" class="nav-link">
+        <i class="fas fa-user-graduate"></i> Students
+      </a>
+
+      <a href="teacher.html" class="nav-link">
+        <i class="fas fa-chalkboard-teacher"></i> Teachers
+      </a>
+
+      <a href="id-card.html" class="nav-link">
+        <i class="fas fa-id-card"></i> ID Card
+      </a>
+ 
+
+      <a href="book-delivery-report.html" class="nav-link">
+        <i class="fas fa-book-open"></i> Book Delivery Report
+      </a>
+<a href="admit_card.html" class="nav-link">
+  <i class="fas fa-id-card"></i> Admit Card
+</a>
+<a href="marksheet.html" class="nav-link">
+  <i class="fas fa-file-alt"></i> Marksheet
+</a>
+
+
+       <a href="payment-history.html" class="nav-link active">
+      <i class="fas fa-history"></i> Payment History
+    </a>
+
+      <a href="settle-due.html" class="nav-link">
+        <i class="fas fa-rupee-sign"></i> Settle Due Amount
+      </a>
+
+      <a href="download.html" class="nav-link">
+        <i class="fas fa-download"></i> Download
+      </a>
+<a href="print.html" class="nav-link">
+  <i class="fas fa-print"></i> Print Admission
+</a>
+
+      <!-- NEW: Edit page link (after Download) -->
+      <a href="edit.html" class="nav-link active">
+        <i class="fas fa-pen-to-square"></i> Edit Student
+      </a>
+<a href="upload.html" class="nav-link">
+  <i class="fas fa-file-upload"></i> Upload Students
+</a>
+
+      <div class="nav-link logout-btn" id="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </div>
+    </aside>
+    
+  <main class="main">
+    <div class="topbar">
+      <h2>Dashboard</h2>
+      <select id="academic-year-select"></select>
+      <span id="page-welcome">Welcome</span>
+    </div>
+
+    <div class="card-grid">
+      <div class="card card-students">
+        <i class="fas fa-user-graduate"></i>
+        <div>Total Students</div>
+        <div class="card-value" id="total-students">0</div>
+      </div>
+      <div class="card card-teachers">
+        <i class="fas fa-chalkboard-teacher"></i>
+        <div>Total Teachers</div>
+        <div class="card-value" id="total-teachers">0</div>
+      </div>
+      <div class="card card-payments">
+        <i class="fas fa-money-check-alt"></i>
+        <div>Total Paid</div>
+        <div class="card-value" id="dash-total-paid-month">?0</div>
+        <small id="dash-total-paid-month-label"></small>
+      </div>
+    </div>
+
+    <div class="section-chart">
+      <h3>Monthly Paid Amount (Academic Year)</h3>
+      <div id="monthly-bar-year-label"></div>
+      <div class="monthly-bar-chart" id="monthly-bar-chart"></div>
+
+      <!-- ? NEW CLASS-WISE TOTAL STUDENTS -->
+      <div class="class-wise-summary">
+        <h4>Class-wise Total Students</h4>
+        <div class="class-wise-grid" id="class-wise-summary"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="app.js"></script>
+<script>window.onload=()=>document.getElementById("app").classList.remove("hidden")</script>
+</body>
+</html>

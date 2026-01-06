@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Students | School Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #1A2A6C;
+      color: #333;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: url('https://images.unsplash.com/photo-1581078426770-6d336e5de7bf?auto=format&fit=crop&w=1974') center/cover;
+      opacity: 0.15;
+      z-index: -1;
+    }
+
+    .hidden { display: none !important; }
+
+    #app {
+      min-height: 100vh;
+      display: flex;
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+    
+    /* Loading animation */
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(26, 42, 108, 0.9);
+      z-index: 9999;
+    }
+    
+    .loader-circle {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255, 255, 255, 0.2);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .sidebar {
+      width: 260px;
+      background: rgba(26, 42, 108, 0.8);
+      backdrop-filter: blur(10px);
+      color: #ecf0f1;
+      padding: 2rem 1rem;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      z-index: 10;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar h2 { 
+      margin-bottom: 2rem; 
+      font-size: 1.5rem; 
+      text-align: center;
+      color: #ffffff;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar h2 i {
+      font-size: 1.6rem;
+      color: #F5C518;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 0.5rem;
+      color: #e5e7eb;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .nav-link i {
+      width: 20px;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateX(4px);
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, #F5C518, #f97316);
+      color: #1f2933;
+      font-weight: 600;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.25);
+    }
+
+    .nav-link.active i {
+      color: #1f2933;
+    }
+
+    .logout-btn {
+      margin-top: 2rem;
+      background: rgba(239, 68, 68, 0.15);
+      color: #fecaca;
+      cursor: pointer;
+    }
+
+    .logout-btn:hover {
+      background: rgba(239, 68, 68, 0.3);
+      color: #fee2e2;
+    }
+
+    .main {
+      flex: 1;
+      padding: 1.5rem 2rem;
+      color: #f9fafb;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .topbar h1 {
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #e5e7eb;
+    }
+
+    .topbar h1 i {
+      color: #F5C518;
+    }
+
+    #page-welcome {
+      font-size: 0.95rem;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.5);
+      padding: 0.5rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    #page-welcome i {
+      color: #38bdf8;
+    }
+
+    .section {
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 16px;
+      padding: 1.5rem 1.5rem 1.3rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section::before {
+      content: '';
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.2), transparent 55%);
+      opacity: 0.6;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .section h3 {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #e5e7eb;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .section h3 i {
+      color: #38bdf8;
+    }
+
+    .inline-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .form-group {
+      flex: 1 1 180px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      min-width: 150px;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      color: #cbd5f5;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 0.6rem 0.75rem;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .form-group textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .btn-sm-primary {
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #38bdf8, #2563eb);
+      border: none;
+      color: #f9fafb;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-sm-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 32px rgba(37, 99, 235, 0.65);
+      filter: brightness(1.05);
+    }
+
+    .btn-sm-primary i {
+      font-size: 0.9rem;
+    }
+
+    .btn-print {
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-print i {
+      color: #facc15;
+    }
+
+    .btn-print:hover {
+      background: rgba(30, 64, 175, 0.9);
+      border-color: #facc15;
+      transform: translateY(-1px);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.8rem;
+      font-size: 0.9rem;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    th, td {
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+    }
+
+    thead {
+      background: rgba(30, 64, 175, 0.9);
+      color: #e5e7eb;
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    tbody tr:nth-child(odd) {
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    tbody tr:hover {
+      background: rgba(30, 64, 175, 0.8);
+    }
+
+    .class-detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .class-detail-header h3 {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 900px) {
+      #app {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 1rem;
+        position: sticky;
+        top: 0;
+      }
+      .sidebar h2 {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .nav-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+      }
+      .main {
+        padding: 1rem;
+      }
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.6rem;
+      }
+      .inline-form {
+        flex-direction: column;
+      }
+      .form-group {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading animation -->
+  <div class="loader" id="loader">
+    <div class="loader-circle"></div>
+  </div>
+
+  <div id="app" class="hidden">
+    <aside class="sidebar">
+      <h2><i class="fas fa-graduation-cap"></i> School Panel</h2>
+
+      <a href="index.html" class="nav-link">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
+
+      <a href="student.html" class="nav-link">
+        <i class="fas fa-user-graduate"></i> Students
+      </a>
+
+      <a href="teacher.html" class="nav-link">
+        <i class="fas fa-chalkboard-teacher"></i> Teachers
+      </a>
+
+      <a href="id-card.html" class="nav-link">
+        <i class="fas fa-id-card"></i> ID Card
+      </a>
+
+      <a href="book-delivery-report.html" class="nav-link">
+        <i class="fas fa-book-open"></i> Book Delivery Report
+      </a>
+<a href="admit_card.html" class="nav-link">
+  <i class="fas fa-id-card"></i> Admit Card
+</a>
+<a href="marksheet.html" class="nav-link">
+  <i class="fas fa-file-alt"></i> Marksheet
+</a>
+
+
+      
+       <a href="payment-history.html" class="nav-link active">
+      <i class="fas fa-history"></i> Payment History
+    </a>
+
+      <a href="settle-due.html" class="nav-link">
+        <i class="fas fa-rupee-sign"></i> Settle Due Amount
+      </a>
+
+      <a href="download.html" class="nav-link">
+        <i class="fas fa-download"></i> Download
+      </a>
+<a href="print.html" class="nav-link">
+  <i class="fas fa-print"></i> Print Admission
+</a>
+
+      <!-- NEW: Edit page link (after Download) -->
+      <a href="edit.html" class="nav-link active">
+        <i class="fas fa-pen-to-square"></i> Edit Student
+      </a>
+
+      <div class="nav-link logout-btn" id="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <h1><i class="fas fa-user-graduate"></i> Students</h1>
+        <span id="page-welcome"><i class="fas fa-user-circle"></i> Welcome, Admin</span>
+      </div>
+
+      <!-- ? Add Student Section -->
+      <div class="section">
+        <h3><i class="fas fa-user-plus"></i> Add Student</h3>
+
+       <form id="student-form" class="inline-form">
+
+  <div class="form-group">
+    <label>Student Name</label>
+    <input type="text" id="student-name" required>
+  </div>
+
+  <div class="form-group">
+    <label>Roll No</label>
+    <input type="text" id="student-roll">
+  </div>
+
+  <div class="form-group">
+    <label>Father Name</label>
+    <input type="text" id="student-father" required>
+  </div>
+
+  <div class="form-group">
+    <label>Class</label>
+    <input type="text" id="student-class" required>
+  </div>
+
+  <div class="form-group">
+    <label>Section</label>
+    <input type="text" id="student-section">
+  </div>
+
+  <div class="form-group">
+    <label>Mobile</label>
+    <input type="text" id="student-mobile">
+  </div>
+
+  <div class="form-group">
+    <label>Gender</label>
+    <select id="student-gender">
+      <option value="">Select</option>
+      <option>Male</option>
+      <option>Female</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Date of Admission</label>
+    <input type="date" id="student-date">
+  </div>
+
+  <div class="form-group">
+    <label>Date of Birth</label>
+    <input type="date" id="student-dob">
+  </div>
+
+  <div class="form-group">
+    <label>Age (Auto)</label>
+    <input type="number" id="student-age" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>School Name</label>
+    <input type="text" id="school-name">
+  </div>
+
+  <div class="form-group">
+    <label>Admission Fee</label>
+    <input type="number" id="student-fee">
+  </div>
+
+  <div class="form-group">
+    <label>Monthly Fee</label>
+    <input type="number" id="student-monthly-fee">
+  </div>
+
+  <div class="form-group">
+    <label>Due Fee</label>
+    <input type="number" id="student-due-fee">
+  </div>
+
+  
+
+  
+ <div style="display:flex; gap:10px; align-items: flex-end;">
+            <button class="btn-sm-primary" type="submit">
+              <i class="fas fa-plus-circle"></i> Add
+            </button>
+
+  
+
+</form>
+
+         
+            <button id="student-print-btn" type="button" class="btn-print">
+              <i class="fas fa-print"></i> Print
+            </button>
+          </div>
+        </form>
+      </div>
+
+     
+      <!-- Class detail section -->
+      <div id="class-detail-section" class="section hidden">
+        <div class="class-detail-header">
+          <h3>Class <span id="class-detail-title"></span> Students</h3>
+          <button id="class-detail-close" class="btn-sm-primary">
+            <i class="fas fa-times-circle"></i> Close
+          </button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Name</th><th>Roll</th><th>Class</th>
+              <th>Section</th><th>Date</th><th>Fee</th><th>Due</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="class-detail-body"></tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Hide loader when page is fully loaded
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('app').classList.remove('hidden');
+      }, 500);
+    });
+  </script>
+
+  <script src="student.js"></script>
+</body>
+</html>

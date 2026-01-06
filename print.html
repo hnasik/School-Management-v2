@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Print Admission | School Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1A2A6C, #B21F1F, #1A2A6C);
+      min-height: 100vh;
+    }
+
+    #app {
+      min-height: 100vh;
+      display: flex;
+      backdrop-filter: blur(10px);
+    }
+
+    /* ===== SIDEBAR (same as dashboard) ===== */
+    .sidebar {
+      width: 260px;
+      background: rgba(255,255,255,0.95);
+      padding: 2rem 1rem;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.08);
+    }
+
+    .sidebar h2 {
+      margin-bottom: 2rem;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      text-decoration: none;
+      color: #555;
+      gap: 10px;
+      font-size: 0.95rem;
+    }
+
+    .nav-link i {
+      color: #1A2A6C;
+      width: 20px;
+      text-align: center;
+    }
+
+    .nav-link.active,
+    .nav-link:hover {
+      background: rgba(26,42,108,0.08);
+      color: #1A2A6C;
+      font-weight: 600;
+    }
+
+    .logout-btn {
+      margin-top: 2rem;
+      color: #B21F1F;
+      font-weight: 600;
+    }
+
+    /* ===== MAIN ===== */
+    .main {
+      flex: 1;
+      padding: 2rem;
+    }
+
+    /* ===== TOPBAR ===== */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.95);
+      padding: 1.5rem 2rem;
+      border-radius: 20px;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    .topbar h1 {
+      font-size: 1.6rem;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* ===== CARD ===== */
+    .card {
+      background: rgba(255,255,255,0.95);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      max-width: 700px;
+    }
+
+    .card h2 {
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    input {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+    }
+
+    button {
+      padding: 0.8rem 1.2rem;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, #1A2A6C, #B21F1F);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #result {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 768px) {
+      #app {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+      }
+      .nav-link {
+        white-space: nowrap;
+        margin-right: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2><i class="fas fa-graduation-cap"></i> School Panel</h2>
+
+    <a href="index.html" class="nav-link">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+
+    <a href="student.html" class="nav-link">
+      <i class="fas fa-user-graduate"></i> Students
+    </a>
+
+    <a href="teacher.html" class="nav-link">
+      <i class="fas fa-chalkboard-teacher"></i> Teachers
+    </a>
+
+    <a href="id-card.html" class="nav-link">
+      <i class="fas fa-id-card"></i> ID Card
+    </a>
+
+    <a href="book-delivery-report.html" class="nav-link">
+      <i class="fas fa-book-open"></i> Book Delivery Report
+    </a>
+<a href="admit_card.html" class="nav-link">
+  <i class="fas fa-id-card"></i> Admit Card
+</a>
+<a href="marksheet.html" class="nav-link">
+  <i class="fas fa-file-alt"></i> Marksheet
+</a>
+
+
+   
+       <a href="payment-history.html" class="nav-link active">
+      <i class="fas fa-history"></i> Payment History
+    </a>
+    <a href="settle-due.html" class="nav-link">
+      <i class="fas fa-rupee-sign"></i> Settle Due Amount
+    </a>
+
+    <a href="download.html" class="nav-link">
+      <i class="fas fa-download"></i> Download
+    </a>
+<a href="print.html" class="nav-link">
+  <i class="fas fa-print"></i> Print Admission
+</a>
+
+    <!-- NEW: Edit page link (after Download) -->
+    <a href="edit.html" class="nav-link active">
+      <i class="fas fa-pen-to-square"></i> Edit Student
+    </a>
+<div class="nav-link logout-btn" id="logout-btn">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <h1><i class="fas fa-print"></i> Print Admission</h1>
+      <span id="page-welcome">Welcome</span>
+    </div>
+
+    <div class="card">
+      <h2><i class="fas fa-search"></i> Find Student</h2>
+
+      <div class="form-row">
+        <input type="text" id="mobile" placeholder="Enter student mobile number">
+        <button id="searchPrintBtn">
+          <i class="fas fa-print"></i> Print
+        </button>
+      </div>
+
+      <div id="result"></div>
+    </div>
+  </main>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+<script src="print.js"></script>
+</body>
+</html>

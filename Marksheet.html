@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Marksheet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{font-family:Arial;background:#f7fafc;padding:20px}
+.card{background:#fff;padding:20px;border-radius:14px;max-width:1100px;margin:auto;
+box-shadow:0 10px 30px rgba(0,0,0,.12)}
+label{display:block;margin-top:10px;font-size:13px}
+input,select{width:100%;padding:8px;border-radius:8px;border:1px solid #ccc}
+.row{display:flex;gap:10px}
+.row>div{flex:1}
+.subject-row{display:flex;gap:6px;margin-top:8px}
+button{margin-top:15px;padding:10px 18px;border-radius:999px;border:none;
+background:#2563eb;color:white;font-weight:600;cursor:pointer}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ccc;padding:8px;text-align:center}
+</style>
+</head>
+
+<body>
+<div class="card">
+<h2>Generate Marksheet</h2>
+
+<label>School Name</label>
+<input id="schoolName" value="ABC PUBLIC SCHOOL">
+
+<div class="row">
+  <div>
+    <label>Academic Year</label>
+    <select id="season" disabled></select>
+  </div>
+  <div>
+    <label>Class</label>
+    <select id="classSelect"></select>
+  </div>
+  <div>
+    <label>Student</label>
+    <select id="studentSelect"></select>
+  </div>
+</div>
+
+<h3>Subjects</h3>
+<div id="subjects"></div>
+<button onclick="addSubject()">Add Subject</button>
+
+<label>Upload School Logo</label>
+<input type="file" id="logoInput" accept="image/*">
+
+<label>Upload Teacher Signature</label>
+<input type="file" id="teacherSign" accept="image/*">
+
+<label>Upload Principal Signature</label>
+<input type="file" id="principalSign" accept="image/*">
+
+<button onclick="generatePDF()">Generate, Save & Print</button>
+</div>
+
+<!-- Firebase COMPAT SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyCOzfdIXBeh6drFhml4pOFEvPG8xV_Wjzw",
+  authDomain: "school-management-projec-9db7a.firebaseapp.com",
+  projectId: "school-management-projec-9db7a",
+  storageBucket: "school-management-projec-9db7a.firebasestorage.app",
+  messagingSenderId: "975842483778",
+  appId: "1:975842483778:web:d1708792ff56014f3317db",
+  measurementId: "G-1X2Q7LE6G3"
+});
+</script>
+
+<script src="marksheet.js"></script>
+</body>
+</html>

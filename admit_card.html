@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admit Card — School Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Modern Design Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #1a1c2e 0%, #2d3561 50%, #1a1c2e 100%);
+      min-height: 100vh;
+      color: #2d3748;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
+      z-index: -1;
+    }
+    
+    #app {
+      display: flex;
+      gap: 24px;
+      padding: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: rgba(26, 28, 46, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      color: #e2e8f0;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      height: fit-content;
+      position: sticky;
+      top: 24px;
+    }
+    
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      color: #cbd5e0;
+      text-decoration: none;
+      margin-bottom: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .nav-link::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 3px;
+      background: linear-gradient(to bottom, #667eea, #764ba2);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .nav-link.active, .nav-link:hover {
+      background: rgba(102, 126, 234, 0.15);
+      color: #fff;
+      transform: translateX(5px);
+    }
+    
+    .nav-link.active::before, .nav-link:hover::before {
+      transform: translateX(0);
+    }
+    
+    /* Main Content */
+    .main {
+      flex: 1;
+    }
+    
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 20px 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .topbar h1 {
+      color: #2d3561;
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .topbar div {
+      color: #4a5568;
+      font-size: 0.9rem;
+    }
+    
+    /* Section */
+    .section {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .section-title {
+      font-weight: 600;
+      color: #2d3561;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Class Cards */
+    .class-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    
+    .class-card {
+      padding: 20px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f7fafc, #edf2f7);
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .class-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(to right, #667eea, #764ba2);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    
+    .class-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .class-card:hover::before {
+      transform: scaleX(1);
+    }
+    
+    .class-card .num {
+      font-weight: 700;
+      color: #667eea;
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+    
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 9999;
+      padding: 16px;
+    }
+    
+    .modal-overlay.show {
+      display: flex;
+    }
+    
+    .modal {
+      background: #fff;
+      width: 100%;
+      max-width: 900px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+      animation: modalFadeIn 0.3s ease-out;
+    }
+    
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid #edf2f7;
+      background: linear-gradient(to right, #f7fafc, #edf2f7);
+    }
+    
+    .modal-body {
+      padding: 20px 24px;
+      max-height: 65vh;
+      overflow: auto;
+    }
+    
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #edf2f7;
+      font-size: 0.95rem;
+    }
+    
+    th {
+      font-weight: 600;
+      color: #4a5568;
+      background: #f7fafc;
+    }
+    
+    tr:hover {
+      background: #f7fafc;
+    }
+    
+    /* Buttons */
+    .action-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .badge.generated {
+      background: linear-gradient(135deg, #d4edda, #c3e6cb);
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .badge.not-generated {
+      background: linear-gradient(135deg, #fff3cd, #ffeeba);
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+    
+    /* Search & Pagination */
+    .modal-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .search-input {
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      width: 240px;
+      background: #fff;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .pagination {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    
+    .page-btn {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.85rem;
+    }
+    
+    .page-btn:hover {
+      background: #f7fafc;
+      border-color: #cbd5e0;
+    }
+    
+    .page-btn.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-color: transparent;
+    }
+    
+    /* Generate Preview */
+    .gen-preview {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    
+    .gen-photo {
+      width: 140px;
+      height: 160px;
+      background: #f7fafc;
+      border: 2px dashed #cbd5e0;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #a0aec0;
+      font-size: 0.9rem;
+    }
+    
+    .gen-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .gen-info {
+      flex: 1;
+    }
+    
+    .gen-info #gen-name {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #2d3561;
+    }
+    
+    .gen-info #gen-roll, .gen-info #gen-class {
+      color: #718096;
+      margin-top: 6px;
+    }
+    
+    .gen-info label {
+      display: block;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+    }
+    
+    .gen-info input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      margin-top: 6px;
+      transition: all 0.2s ease;
+    }
+    
+    .gen-info input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .gen-controls {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    /* Hidden PDF render area */
+    #pdf-render-area {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+      width: 1200px;
+      padding: 18px;
+      background: #fff;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 900px) {
+      #app {
+        padding: 16px;
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        position: static;
+      }
+      
+      .class-card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
+      
+      .gen-preview {
+        flex-direction: column;
+      }
+      
+      .gen-photo {
+        width: 100%;
+        height: 200px;
+      }
+    }
+    
+    /* Additional modern touches */
+    #closeStudentModal, #closeGenerateModal {
+      background: #f7fafc;
+      color: #4a5568;
+      border: 1px solid #e2e8f0;
+    }
+    
+    #closeStudentModal:hover, #closeGenerateModal:hover {
+      background: #edf2f7;
+    }
+    
+    #markGenerated {
+      background: linear-gradient(135deg, #48bb78, #38a169);
+      color: white;
+    }
+    
+    #printGen {
+      background: linear-gradient(135deg, #4299e1, #3182ce);
+      color: white;
+    }
+    
+    #logout-btn {
+      color: #e2e8f0;
+      margin-top: 20px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    #logout-btn:hover {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <aside class="sidebar">
+      <h2><i class="fas fa-graduation-cap"></i> School Panel</h2>
+      <a href="index.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="student.html" class="nav-link"><i class="fas fa-user-graduate"></i> Students</a>
+      <a href="teacher.html" class="nav-link">
+        <i class="fas fa-chalkboard-teacher"></i> Teachers
+      </a>
+      <a href="id-card.html" class="nav-link"><i class="fas fa-id-card"></i> ID Card</a>
+      <a href="book-delivery-report.html" class="nav-link"><i class="fas fa-book-open"></i> Book Delivery</a>
+      <a href="marksheet.html" class="nav-link">
+        <i class="fas fa-file-alt"></i> Marksheet
+      </a>
+      <a href="payment-history.html" class="nav-link active">
+        <i class="fas fa-history"></i> Payment History
+      </a>
+      <a href="settle-due.html" class="nav-link">
+        <i class="fas fa-rupee-sign"></i> Settle Due Amount
+      </a>
+      <a href="download.html" class="nav-link">
+        <i class="fas fa-download"></i> Download
+      </a>
+      <a href="print.html" class="nav-link">
+        <i class="fas fa-print"></i> Print Admission
+      </a>
+      <a href="edit.html" class="nav-link active">
+        <i class="fas fa-pen-to-square"></i> Edit Student
+      </a>
+      <a href="admit_card.html" class="nav-link active"><i class="fas fa-id-badge"></i> Admit Card</a>
+      <div id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <h1><i class="fas fa-id-card"></i> Admit Card</h1>
+        <div>Click class card ? manage students ? generate admit card</div>
+      </div>
+
+      <section class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="section-title"><i class="fas fa-th-large"></i> Classes</div>
+          <div style="font-size:14px;color:#718096">Academic Year: <span id="academic-year-display"></span></div>
+        </div>
+
+        <div id="class-card-grid" class="class-card-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Student Modal -->
+  <div id="studentModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div>
+          <div id="studentModalTitle" style="font-weight:700">Class — Students</div>
+          <div id="studentModalSub" style="color:#667eea;font-size:14px;margin-top:6px"></div>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center">
+          <div class="modal-controls">
+            <input id="studentSearch" class="search-input" placeholder="Search by name or roll" />
+            <div class="pagination" id="studentPagination"></div>
+          </div>
+          <button id="closeStudentModal" class="action-btn">Close</button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <table>
+          <thead><tr><th>#</th><th>Name</th><th>Roll</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="studentModalBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate Modal -->
+  <div id="generateModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div>
+          <div style="font-weight:700"><i class="fas fa-id-card"></i> Generate Admit Card</div>
+          <div id="generateModalSub" style="color:#667eea;font-size:14px;margin-top:6px">Preview & download</div>
+        </div>
+        <div>
+          <button id="closeGenerateModal" class="action-btn">Close</button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div id="gen-student-summary" style="font-weight:700;color:#2d3561;margin-bottom:16px;font-size:1.1rem"></div>
+
+        <div class="gen-preview">
+          <div class="gen-photo" id="gen-photo">Upload Photo</div>
+          <div class="gen-info">
+            <div id="gen-name">Student Name</div>
+            <div id="gen-roll">Roll: -</div>
+            <div id="gen-class">Class: -</div>
+
+            <div style="margin-top:16px">
+              <label>School Name</label>
+              <input id="gen-school-name" type="text" />
+            </div>
+
+            <div style="margin-top:16px">
+              <label>Exam Name</label>
+              <input id="gen-exam-name" type="text" />
+            </div>
+
+            <div class="gen-controls">
+              <button id="downloadGen" class="btn-primary action-btn">Download PDF</button>
+              <button id="printGen" class="action-btn">Print</button>
+              <button id="markGenerated" class="action-btn">Mark Generated</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- hidden area used to render a nicer PDF template -->
+  <div id="pdf-render-area" aria-hidden="true"></div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+  <!-- admit_card.js -->
+  <script src="admit_card.js"></script>
+</body>
+</html>

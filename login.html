@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>School Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Updated: 30 Nov 2025 -->
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    body { background: linear-gradient(135deg, #4f46e5, #6366f1); min-height: 100vh; display: flex;
+      align-items: center; justify-content: center; }
+    .login-card { background: white; padding: 2rem 2.5rem; border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15); width: 100%; max-width: 380px; }
+    h2 { text-align: center; margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; margin-bottom: 0.35rem; }
+    input[type="text"], input[type="password"] {
+      width: 100%; padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid #d1d5db; outline: none;
+    }
+    button { width: 100%; padding: 0.7rem; border-radius: 8px; border: none;
+      background: #4f46e5; color: white; cursor: pointer; }
+    .login-error { margin-top: 0.7rem; color: red; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <h2>School Management Login</h2>
+    <form id="login-form">
+      <div class="form-group">
+        <label for="username">User Name (Email)</label>
+        <input type="text" id="username" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" required />
+      </div>
+      <button type="submit">Login</button>
+      <div id="login-error" class="login-error"></div>
+    </form>
+  </div>
+
+  <!-- Firebase SDK (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+  <!-- Login Script -->
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCOzfdIXBeh6drFhml4pOFEvPG8xV_Wjzw",
+      authDomain: "school-management-projec-9db7a.firebaseapp.com",
+      projectId: "school-management-projec-9db7a",
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    const loginForm = document.getElementById("login-form");
+    const loginError = document.getElementById("login-error");
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        window.location.href = "index.html"; // Redirect to dashboard
+      } catch (error) {
+        loginError.textContent = "Invalid email or password.";
+      }
+    });
+
+    // If already logged in, auto redirect
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+</body>
+</html>

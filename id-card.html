@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ID Card | School Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    }
+    
+    body { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+      color: #333; 
+      min-height: 100vh; 
+      position: relative; 
+    }
+    
+    body::before { 
+      content: ''; 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      right: 0; 
+      bottom: 0; 
+      background: url('https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5?q=80&w=870&auto=format&fit=crop') center/cover; 
+      opacity: 0.1; 
+      z-index: -1; 
+    }
+    
+    .hidden { display: none !important; }
+    
+    #app { 
+      min-height: 100vh; 
+      display: flex; 
+      backdrop-filter: blur(5px); 
+    }
+    
+    .sidebar { 
+      width: 260px; 
+      background: linear-gradient(180deg, #4a148c, #7b1fa2, #9c27b0); 
+      color: #ecf0f1; 
+      padding: 2rem 1rem; 
+      box-shadow: 3px 0 15px rgba(0,0,0,0.2); 
+      transition: all 0.3s ease; 
+    }
+    
+    .sidebar h2 { 
+      margin-bottom: 2rem; 
+      font-size: 1.5rem; 
+      text-align: center; 
+      color: #fff; 
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.3); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 10px; 
+    }
+    
+    .sidebar h2 i { 
+      font-size: 1.8rem; 
+      color: #e1bee7; 
+    }
+    
+    .nav-link { 
+      display: flex; 
+      align-items: center; 
+      padding: 0.8rem 1rem; 
+      border-radius: 8px; 
+      margin-bottom: 0.5rem; 
+      cursor: pointer; 
+      font-size: 1rem; 
+      text-decoration: none; 
+      color: #ecf0f1; 
+      transition: all 0.3s ease; 
+      gap: 10px; 
+    }
+    
+    .nav-link i { 
+      width: 20px; 
+      text-align: center; 
+    }
+    
+    .nav-link.active, .nav-link:hover { 
+      background: rgba(255, 255, 255, 0.15); 
+      transform: translateX(5px); 
+    }
+    
+    .nav-link.active {
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .logout-btn { 
+      margin-top: 2rem; 
+      background: #d32f2f; 
+      text-align: center; 
+    }
+    
+    .logout-btn:hover { 
+      background: #b71c1c; 
+    }
+    
+    .main { 
+      flex: 1; 
+      padding: 2rem; 
+      overflow-y: auto; 
+    }
+    
+    .topbar { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 2rem; 
+      background: rgba(255, 255, 255, 0.95); 
+      padding: 1.5rem 2rem; 
+      border-radius: 20px; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+    }
+    
+    .topbar h1 { 
+      font-size: 1.8rem; 
+      color: #4a148c; 
+      display: flex; 
+      align-items: center; 
+      gap: 15px; 
+    }
+    
+    .topbar h1 i { 
+      color: #9c27b0; 
+      font-size: 2rem;
+    }
+    
+    .section { 
+      background: rgba(255, 255, 255, 0.95); 
+      padding: 2rem; 
+      border-radius: 20px; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+      margin-top: 1.5rem; 
+    }
+    
+    .section-title { 
+      margin-bottom: 1.5rem; 
+      font-size: 1.4rem; 
+      color: #4a148c; 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+    }
+    
+    .section-title i { 
+      color: #9c27b0; 
+      font-size: 1.5rem;
+    }
+    
+    .class-card-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+      gap: 1rem; 
+      margin-top: 1rem; 
+    }
+    
+    .class-card { 
+      border-radius: 16px; 
+      padding: 1.2rem 1rem; 
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12); 
+      cursor: pointer; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 0.3rem; 
+      transition: transform 0.2s ease, box-shadow 0.2s ease; 
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .class-card:hover { 
+      transform: translateY(-5px); 
+      box-shadow: 0 10px 20px rgba(0,0,0,0.18); 
+    }
+    
+    .class-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.7), rgba(255,255,255,0.1));
+    }
+    
+    .class-card-title { 
+      font-weight: 600; 
+      color: #fff; 
+      font-size: 1.1rem; 
+      display: flex; 
+      align-items: center; 
+      gap: 0.5rem; 
+    }
+    
+    .class-card-sub { 
+      font-size: 0.8rem; 
+      color: rgba(255,255,255,0.8); 
+    }
+    
+    /* Individual class card colors */
+    .class-card[data-class="1"] { background: linear-gradient(135deg, #FF6B6B, #FF8E53); }
+    .class-card[data-class="2"] { background: linear-gradient(135deg, #4ECDC4, #44A08D); }
+    .class-card[data-class="3"] { background: linear-gradient(135deg, #45B7D1, #2196F3); }
+    .class-card[data-class="4"] { background: linear-gradient(135deg, #F7B731, #F79F1F); }
+    .class-card[data-class="5"] { background: linear-gradient(135deg, #5F27CD, #341F97); }
+    .class-card[data-class="6"] { background: linear-gradient(135deg, #00D2D3, #00A8B5); }
+    .class-card[data-class="7"] { background: linear-gradient(135deg, #FC5C65, #EB3B5A); }
+    .class-card[data-class="8"] { background: linear-gradient(135deg, #FD79A8, #FDCB6E); }
+    .class-card[data-class="9"] { background: linear-gradient(135deg, #6C5CE7, #A29BFE); }
+    .class-card[data-class="10"] { background: linear-gradient(135deg, #00B894, #00CEC9); }
+    .class-card[data-class="11"] { background: linear-gradient(135deg, #E17055, #FAB1A0); }
+    .class-card[data-class="12"] { background: linear-gradient(135deg, #74B9FF, #A29BFE); }
+    
+    .modal-overlay { 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0,0,0,0.6); 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      z-index: 50; 
+      backdrop-filter: blur(5px);
+    }
+    
+    .modal-content { 
+      background: #fff; 
+      border-radius: 20px; 
+      padding: 1.5rem 2rem; 
+      max-width: 700px; 
+      width: 90%; 
+      max-height: 80vh; 
+      display: flex; 
+      flex-direction: column; 
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+    }
+    
+    .modal-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 1.5rem; 
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .modal-title { 
+      font-size: 1.3rem; 
+      font-weight: 600; 
+      color: #4a148c; 
+      display: flex; 
+      align-items: center; 
+      gap: 0.5rem; 
+    }
+    
+    .modal-title i {
+      color: #9c27b0;
+    }
+    
+    .modal-close { 
+      border: none; 
+      background: transparent; 
+      font-size: 1.5rem; 
+      cursor: pointer; 
+      color: #9e9e9e; 
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    
+    .modal-close:hover { 
+      color: #4a148c; 
+      background: rgba(156, 39, 176, 0.1);
+    }
+    
+    .modal-body { 
+      overflow-y: auto; 
+    }
+    
+    .modal-body table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      font-size: 0.9rem; 
+    }
+    
+    .modal-body th, .modal-body td { 
+      padding: 0.8rem 0.6rem; 
+      border-bottom: 1px solid #f0f0f0; 
+      text-align: left; 
+    }
+    
+    .modal-body th { 
+      background: linear-gradient(135deg, #4a148c, #7b1fa2); 
+      color: white; 
+      position: sticky; 
+      top: 0; 
+      z-index: 1; 
+    }
+    
+    .status-btn-group { 
+      display: flex; 
+      gap: 0.5rem; 
+      flex-wrap: wrap; 
+    }
+    
+    .btn-compact { 
+      padding: 0.4rem 0.8rem; 
+      font-size: 0.8rem; 
+      border-radius: 20px; 
+      border: none; 
+      cursor: pointer; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 0.3rem; 
+      transition: all 0.2s ease;
+    }
+    
+    .btn-id-created { 
+      background: #e1f5fe; 
+      color: #0277bd; 
+    }
+    
+    .btn-id-created.active { 
+      background: #0288d1; 
+      color: #ffffff; 
+      box-shadow: 0 4px 8px rgba(2, 136, 209, 0.3);
+    }
+    
+    .btn-delivered { 
+      background: #e8f5e9; 
+      color: #2e7d32; 
+    }
+    
+    .btn-delivered:disabled { 
+      opacity: 0.6; 
+      cursor: default; 
+    }
+    
+    .btn-not-delivered { 
+      background: #ffebee; 
+      color: #c62828; 
+    }
+    
+    .gen-form-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+      gap: 1.2rem; 
+      margin-bottom: 1.5rem; 
+    }
+    
+    .form-group { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 0.5rem; 
+      font-size: 0.9rem; 
+    }
+    
+    .form-group label { 
+      color: #4a148c; 
+      font-weight: 500;
+    }
+    
+    .form-group input[type="file"], .form-group input[type="text"] { 
+      padding: 0.7rem 1rem; 
+      border-radius: 10px; 
+      border: 1px solid #e0e0e0; 
+      font-size: 0.9rem; 
+      outline: none; 
+      background: #f9f9f9; 
+      transition: all 0.2s ease;
+    }
+    
+    .form-group input:focus { 
+      border-color: #9c27b0; 
+      box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2); 
+      background: #fff;
+    }
+    
+    .gen-preview-wrapper { 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 1.5rem; 
+      margin-top: 1rem; 
+    }
+    
+    .gen-preview-block { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 0.5rem; 
+      align-items: flex-start; 
+    }
+    
+    .gen-card { 
+      background: #fff; 
+      border-radius: 16px; 
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
+      padding: 1rem; 
+      width: 280px; 
+      height: 170px; 
+      display: grid; 
+      grid-template-columns: 90px 1fr; 
+      gap: 0.8rem; 
+      font-size: 0.8rem; 
+      color: #374151; 
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .gen-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #4a148c, #9c27b0);
+    }
+    
+    .gen-card-portrait { 
+      width: 220px; 
+      height: 320px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: stretch; 
+    }
+    
+    .gen-photo-box { 
+      width: 90px; 
+      height: 90px; 
+      border-radius: 12px; 
+      background: #f0f0f0; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      overflow: hidden; 
+      font-size: 2rem; 
+      color: #9e9e9e; 
+    }
+    
+    .gen-photo-box img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+    }
+    
+    .gen-photo-box-portrait { 
+      width: 100px; 
+      height: 100px; 
+      border-radius: 12px; 
+      background: #f0f0f0; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      overflow: hidden; 
+      font-size: 2rem; 
+      color: #9e9e9e; 
+      margin: 0.5rem auto; 
+    }
+    
+    .gen-photo-box-portrait img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+    }
+    
+    .gen-card-title { 
+      font-weight: 600; 
+      font-size: 1rem; 
+      color: #4a148c; 
+      margin-bottom: 0.2rem; 
+    }
+    
+    .gen-card-line { 
+      margin: 0.1rem 0; 
+    }
+    
+    .gen-footer-row { 
+      margin-top: auto; 
+      font-size: 0.75rem; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      color: #757575; 
+    }
+    
+    .gen-school-name { 
+      font-weight: 600; 
+      font-size: 0.9rem; 
+      color: #4a148c; 
+    }
+    
+    .download-controls { 
+      margin-top: 1.5rem; 
+      display: flex; 
+      flex-wrap: wrap; 
+      align-items: center; 
+      justify-content: space-between; 
+      gap: 1rem; 
+    }
+    
+    .orientation-select { 
+      display: flex; 
+      gap: 1.5rem; 
+      font-size: 0.9rem; 
+      color: #4a148c; 
+      align-items: center; 
+      flex-wrap: wrap; 
+    }
+    
+    .orientation-select label { 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 0.5rem; 
+      cursor: pointer; 
+      font-weight: 500;
+    }
+    
+    .btn { 
+      padding: 0.8rem 1.5rem; 
+      border-radius: 30px; 
+      border: none; 
+      font-size: 0.9rem; 
+      cursor: pointer; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 8px; 
+      transition: all 0.2s ease; 
+      font-weight: 500;
+    }
+    
+    .btn-primary { 
+      background: linear-gradient(135deg, #4a148c, #7b1fa2); 
+      color: white; 
+      box-shadow: 0 4px 10px rgba(74, 20, 140, 0.3);
+    }
+    
+    .btn-primary:hover { 
+      background: linear-gradient(135deg, #3a0d7c, #6a1b9a); 
+      transform: translateY(-2px); 
+      box-shadow: 0 6px 15px rgba(74, 20, 140, 0.4);
+    }
+    
+    @media (max-width: 768px) { 
+      #app { flex-direction: column; } 
+      .sidebar { width: 100%; display: flex; overflow-x: auto; padding: 1rem; } 
+      .sidebar h2 { display: none; } 
+      .nav-link { margin-right: 0.5rem; white-space: nowrap; } 
+      .logout-btn { margin-left: auto; } 
+      .class-card-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar">
+    <h2><i class="fas fa-graduation-cap"></i> School Panel</h2>
+
+    <a href="index.html" class="nav-link">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+
+    <a href="student.html" class="nav-link">
+      <i class="fas fa-user-graduate"></i> Students
+    </a>
+
+    <a href="teacher.html" class="nav-link">
+      <i class="fas fa-chalkboard-teacher"></i> Teachers
+    </a>
+
+    <a href="id-card.html" class="nav-link">
+      <i class="fas fa-id-card"></i> ID Card
+    </a>
+
+    <a href="book-delivery-report.html" class="nav-link">
+      <i class="fas fa-book-open"></i> Book Delivery Report
+    </a>
+<a href="admit_card.html" class="nav-link">
+  <i class="fas fa-id-card"></i> Admit Card
+</a>
+<a href="marksheet.html" class="nav-link">
+  <i class="fas fa-file-alt"></i> Marksheet
+</a>
+
+
+    
+       <a href="payment-history.html" class="nav-link active">
+      <i class="fas fa-history"></i> Payment History
+    </a>
+    <a href="settle-due.html" class="nav-link">
+      <i class="fas fa-rupee-sign"></i> Settle Due Amount
+    </a>
+
+    <a href="download.html" class="nav-link">
+      <i class="fas fa-download"></i> Download
+    </a>
+<a href="print.html" class="nav-link">
+  <i class="fas fa-print"></i> Print Admission
+</a>
+
+    <!-- NEW: Edit page link (after Download) -->
+    <a href="edit.html" class="nav-link active">
+      <i class="fas fa-pen-to-square"></i> Edit Student
+    </a>
+
+    <div class="nav-link logout-btn" id="logout-btn">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <h1><i class="fas fa-id-card"></i> ID Card</h1>
+      <span style="font-size:0.95rem; color:#6a1b9a; font-weight:500;">
+        Manage student ID card & delivery status
+      </span>
+    </div>
+
+    <!-- Students by Class only -->
+    <section class="section">
+      <h2 class="section-title">
+        <i class="fas fa-users"></i> Students by Class
+      </h2>
+      <p style="font-size:0.9rem; color:#6a1b9a; margin-bottom:1rem; font-weight:500;">
+        Click a class card to view students from Firestore and update ID Card / Delivery status.
+      </p>
+      <div class="class-card-grid">
+        <!-- class cards 1..12 with vibrant colors -->
+        <div class="class-card" data-class="1">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 1</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="2">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 2</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="3">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 3</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="4">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 4</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="5">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 5</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="6">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 6</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="7">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 7</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="8">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 8</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="9">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 9</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="10">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 10</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="11">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 11</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="12">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 12</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal for students of selected class -->
+<div id="student-modal" class="modal-overlay hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">
+        <i class="fas fa-users"></i>
+        <span id="modal-title-text">Class Students</span>
+      </div>
+      <button id="modal-close" class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Student</th>
+            <th>Roll</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="modal-student-body">
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Generate ID Card -->
+<div id="generate-modal" class="modal-overlay hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">
+        <i class="fas fa-id-card"></i>
+        <span>Generate ID Card</span>
+      </div>
+      <button id="generate-close" class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="gen-student-summary" style="font-size:0.9rem; margin-bottom:1rem; color:#4a148c; font-weight:500;">
+        <!-- Filled by JS -->
+      </div>
+
+      <!-- Form: photo, school name, academic year, signature -->
+      <div class="gen-form-grid">
+        <div class="form-group">
+          <label>Upload Photo</label>
+          <input type="file" id="gen-photo-input" accept="image/*" />
+        </div>
+        <div class="form-group">
+          <label>School Name</label>
+          <input type="text" id="gen-school-name" placeholder="Enter school name" />
+        </div>
+
+        <!-- NEW: Academic Year -->
+        <div class="form-group">
+          <label>Academic Year (Session)</label>
+          <input type="text" id="gen-academic-year" placeholder="e.g. 2024-2025" />
+        </div>
+
+        <!-- NEW: Signature upload (works like photo; saved as default) -->
+        <div class="form-group">
+          <label>Upload Signature</label>
+          <input type="file" id="gen-signature-input" accept="image/*" />
+        </div>
+      </div>
+
+      <div class="gen-preview-wrapper">
+        <div class="gen-preview-block">
+          <div class="gen-card" id="gen-card-landscape">
+            <div class="gen-photo-box">
+              <img id="gen-photo-landscape" alt="" style="display:none;" />
+              <span id="gen-photo-landscape-placeholder"><i class="fas fa-user"></i></span>
+            </div>
+            <div>
+              <div class="gen-card-title" id="gen-name-landscape">Student Name</div>
+              <div class="gen-card-line" id="gen-class-roll-landscape">Class: - | Roll: -</div>
+              <div class="gen-card-line gen-school-name" id="gen-school-landscape">Your School Name</div>
+            </div>
+            <div class="gen-footer-row">
+              <span>ID Card</span>
+              <span id="gen-footer-note-landscape">Session: -</span>
+            </div>
+
+            <!-- signature image for landscape (positioned visually in footer via CSS) -->
+            <img id="gen-signature-landscape" alt="signature" style="max-width:120px; max-height:40px; object-fit:contain; display:none; margin-top:6px;"/>
+          </div>
+          <div style="font-size:0.9rem; color:#4a148c; font-weight:500;">Landscape Preview</div>
+        </div>
+
+        <div class="gen-preview-block">
+          <div class="gen-card gen-card-portrait" id="gen-card-portrait">
+            <div style="text-align:center; margin-bottom:0.5rem;">
+              <div class="gen-school-name" id="gen-school-portrait">Your School Name</div>
+              <div style="font-size:0.75rem; color:#757575;">ID Card</div>
+            </div>
+            <div class="gen-photo-box-portrait">
+              <img id="gen-photo-portrait" alt="" style="display:none;" />
+              <span id="gen-photo-portrait-placeholder"><i class="fas fa-user"></i></span>
+            </div>
+            <div style="font-size:0.8rem; color:#374151; padding:0 0.3rem;">
+              <div class="gen-card-line"><strong>Name:</strong> <span id="gen-name-portrait">Student Name</span></div>
+              <div class="gen-card-line"><strong>Class / Roll:</strong> <span id="gen-class-roll-portrait">Class: - | Roll: -</span></div>
+            </div>
+            <div class="gen-footer-row" style="padding:0 0.3rem; margin-top:auto;">
+              <span>Session: <span id="gen-footer-note-portrait">-</span></span>
+              <span>
+                <img id="gen-signature-portrait" alt="signature" style="max-width:120px; max-height:40px; object-fit:contain; display:none;" />
+                <span id="gen-signature-placeholder" style="font-size:0.8rem; color:#757575;">Signature</span>
+              </span>
+            </div>
+          </div>
+          <div style="font-size:0.9rem; color:#4a148c; font-weight:500;">Portrait Preview</div>
+        </div>
+      </div>
+
+      <div class="download-controls">
+        <div class="orientation-select">
+          <span>Select for download:</span>
+          <label>
+            <input type="radio" name="gen-orientation" value="landscape" checked /> Landscape
+          </label>
+          <label>
+            <input type="radio" name="gen-orientation" value="portrait" /> Portrait
+          </label>
+        </div>
+        <button class="btn btn-primary" id="gen-download-btn">
+          <i class="fas fa-download"></i> Download JPG
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCOzfdIXBeh6drFhml4pOFEvPG8xV_Wjzw",
+    authDomain: "school-management-projec-9db7a.firebaseapp.com",
+    projectId: "school-management-projec-9db7a",
+    storageBucket: "school-management-projec-9db7a.firebasestorage.app",
+    messagingSenderId: "975842483778",
+    appId: "1:975842483778:web:d1708792ff56014f3317db",
+    measurementId: "G-1X2Q7LE6G3"
+  };
+
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+
+  // Global auth + db for id-card.js
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  auth.onAuthStateChanged((user) => {
+    if (!user) {
+      console.log("Not logged in on ID Card page");
+    }
+  });
+</script>
+
+<!-- html2canvas for JPG download -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<!-- Page logic (updated) -->
+<script src="id-card.js"></script>
+
+</body>
+</html>

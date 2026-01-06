@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Students</title>
+  <style>
+    .progress {
+      width: 100%;
+      background: #ddd;
+      height: 10px;
+      margin-top: 10px;
+    }
+    .bar {
+      height: 10px;
+      width: 0%;
+      background: green;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Upload Students</h2>
+
+<!-- Year Selector -->
+<label>Academic Year</label>
+<select id="yearSelect">
+  <option value="2024">2024</option>
+  <option value="2025" selected>2025</option>
+</select>
+
+<br><br>
+
+<!-- Class Selector -->
+<label>Class</label>
+<select id="classSelect">
+  <script>
+    for (let i = 1; i <= 12; i++) {
+      document.write(`<option value="class_${i}">Class ${i}</option>`);
+    }
+  </script>
+</select>
+
+<br><br>
+
+<button onclick="downloadTemplate()">Download CSV Template</button>
+
+<br><br>
+
+<input type="file" id="fileInput" accept=".csv,.xlsx">
+<button id="previewBtn">Preview</button>
+<button id="uploadBtn">Upload</button>
+
+<!-- Progress -->
+<div class="progress">
+  <div class="bar" id="progressBar"></div>
+</div>
+
+<p id="status"></p>
+
+<!-- Preview Table -->
+<table id="previewTable"></table>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<!-- Excel Reader -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<script src="upload.js"></script>
+</body>
+</html>

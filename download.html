@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Download Students | School Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4a148c;
+      --secondary-color: #7b1fa2;
+      --accent-color: #9c27b0;
+      --success-color: #10b981;
+      --danger-color: #ef4444;
+      --warning-color: #f59e0b;
+      --dark-color: #1f2937;
+      --light-color: #f9fafb;
+      --gray-color: #6b7280;
+      --border-radius: 16px;
+      --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: var(--dark-color);
+      position: relative;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('https://images.unsplash.com/photo-1554224154-260325c0598c?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0') center/cover;
+      opacity: 0.1;
+      z-index: -1;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #app {
+      min-height: 100vh;
+      display: flex;
+      backdrop-filter: blur(5px);
+    }
+
+    .sidebar {
+      width: 260px;
+      background: linear-gradient(180deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+      color: #ecf0f1;
+      padding: 2rem 1rem;
+      box-shadow: 3px 0 15px rgba(0,0,0,0.2);
+      transition: var(--transition);
+    }
+
+    .sidebar h2 {
+      margin-bottom: 2rem;
+      font-size: 1.5rem;
+      text-align: center;
+      color: white;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .sidebar h2 i {
+      font-size: 1.8rem;
+      color: #e1bee7;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+      text-decoration: none;
+      color: #ecf0f1;
+      transition: var(--transition);
+      gap: 12px;
+    }
+
+    .nav-link i {
+      width: 20px;
+      text-align: center;
+    }
+
+    .nav-link.active,
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      transform: translateX(5px);
+    }
+
+    .nav-link.active {
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .logout-btn {
+      margin-top: 2rem;
+      background: #d32f2f;
+      text-align: center;
+    }
+
+    .logout-btn:hover {
+      background: #b71c1c;
+    }
+
+    .main {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding: 1.5rem 2rem;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .topbar h1 {
+      font-size: 1.8rem;
+      color: var(--primary-color);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .topbar h1 i {
+      color: var(--accent-color);
+      font-size: 2rem;
+    }
+
+    #page-welcome {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      color: var(--primary-color);
+    }
+
+    #page-welcome i {
+      color: var(--accent-color);
+    }
+
+    .section {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      margin-bottom: 2rem;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    }
+
+    .section:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+
+    .section-title {
+      margin-bottom: 1.5rem;
+      font-size: 1.4rem;
+      color: var(--primary-color);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 0.8rem;
+      border-bottom: 2px solid rgba(156, 39, 176, 0.1);
+    }
+
+    .section-title i {
+      color: var(--accent-color);
+      font-size: 1.5rem;
+    }
+
+    .inline-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      flex: 1 1 200px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.6rem;
+      font-size: 0.95rem;
+      color: var(--primary-color);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    label i {
+      color: var(--accent-color);
+    }
+
+    select {
+      width: 100%;
+      padding: 0.8rem 1.2rem;
+      border-radius: var(--border-radius);
+      border: 1px solid #e0e0e0;
+      outline: none;
+      font-size: 0.95rem;
+      transition: var(--transition);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    select:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2);
+      background: white;
+    }
+
+    .btn-primary {
+      padding: 0.8rem 1.5rem;
+      border-radius: 30px;
+      border: none;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      cursor: pointer;
+      font-weight: 500;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 10px rgba(74, 20, 140, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #3a0d7c, #6a1b9a);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(74, 20, 140, 0.4);
+    }
+
+    .text-small {
+      font-size: 0.9rem;
+      color: var(--primary-color);
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .text-small i {
+      color: var(--accent-color);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 0.8rem 1rem;
+      text-align: left;
+    }
+
+    th {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: rgba(156, 39, 176, 0.05);
+    }
+
+    tr:hover {
+      background-color: rgba(156, 39, 176, 0.1);
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-paid {
+      background: rgba(16, 185, 129, 0.15);
+      color: #059669;
+    }
+
+    .status-paid i {
+      color: #059669;
+    }
+
+    .status-due {
+      background: rgba(239, 68, 68, 0.15);
+      color: #dc2626;
+    }
+
+    .status-due i {
+      color: #dc2626;
+    }
+
+    .notification {
+      padding: 1rem 1.5rem;
+      border-radius: var(--border-radius);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .notification::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+    }
+
+    .notification-success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success-color);
+    }
+
+    .notification-success::before {
+      background: var(--success-color);
+    }
+
+    .notification-error {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger-color);
+    }
+
+    .notification-error::before {
+      background: var(--danger-color);
+    }
+
+    .notification-warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning-color);
+    }
+
+    .notification-warning::before {
+      background: var(--warning-color);
+    }
+
+    .notification i {
+      font-size: 1.3rem;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(156, 39, 176, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--accent-color);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .filter-card {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+    }
+
+    .filter-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+    }
+
+    .preview-card {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      margin-top: 1rem;
+      transition: var(--transition);
+    }
+
+    .preview-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+    }
+
+    @media (max-width: 768px) {
+      #app {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+        padding: 1rem;
+      }
+      .sidebar h2 {
+        display: none;
+      }
+      .nav-link {
+        margin-right: 0.5rem;
+        white-space: nowrap;
+      }
+      .logout-btn {
+        margin-left: auto;
+      }
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      .inline-form {
+        flex-direction: column;
+      }
+      .form-group {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="hidden">
+    <aside class="sidebar">
+    <h2><i class="fas fa-graduation-cap"></i> School Panel</h2>
+
+    <a href="index.html" class="nav-link">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+
+    <a href="student.html" class="nav-link">
+      <i class="fas fa-user-graduate"></i> Students
+    </a>
+
+    <a href="teacher.html" class="nav-link">
+      <i class="fas fa-chalkboard-teacher"></i> Teachers
+    </a>
+
+    <a href="id-card.html" class="nav-link">
+      <i class="fas fa-id-card"></i> ID Card
+    </a>
+
+    <a href="book-delivery-report.html" class="nav-link">
+      <i class="fas fa-book-open"></i> Book Delivery Report
+    </a>
+<a href="admit_card.html" class="nav-link">
+  <i class="fas fa-id-card"></i> Admit Card
+</a>
+<a href="marksheet.html" class="nav-link">
+  <i class="fas fa-file-alt"></i> Marksheet
+</a>
+
+
+    
+       <a href="payment-history.html" class="nav-link active">
+      <i class="fas fa-history"></i> Payment History
+    </a>
+
+    <a href="settle-due.html" class="nav-link">
+      <i class="fas fa-rupee-sign"></i> Settle Due Amount
+    </a>
+
+    <a href="download.html" class="nav-link">
+      <i class="fas fa-download"></i> Download
+    </a>
+<a href="print.html" class="nav-link">
+  <i class="fas fa-print"></i> Print Admission
+</a>
+
+    <!-- NEW: Edit page link (after Download) -->
+    <a href="edit.html" class="nav-link active">
+      <i class="fas fa-pen-to-square"></i> Edit Student
+    </a>
+
+    <div class="nav-link logout-btn" id="logout-btn">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </div>
+  </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <h1><i class="fas fa-file-download"></i> Download Student List</h1>
+        <span id="page-welcome"><i class="fas fa-user-circle"></i> Welcome, Admin</span>
+      </div>
+
+      <section class="section">
+        <h2 class="section-title"><i class="fas fa-filter"></i> Filter Options</h2>
+        <div id="notification-container"></div>
+
+        <div class="filter-card">
+          <div class="inline-form">
+            <div class="form-group">
+              <label for="class-select"><i class="fas fa-school"></i> Class</label>
+              <select id="class-select">
+                <option value="">Select Class</option>
+                <!-- 1 to 12 -->
+                <option value="1">Class 1</option>
+                <option value="2">Class 2</option>
+                <option value="3">Class 3</option>
+                <option value="4">Class 4</option>
+                <option value="5">Class 5</option>
+                <option value="6">Class 6</option>
+                <option value="7">Class 7</option>
+                <option value="8">Class 8</option>
+                <option value="9">Class 9</option>
+                <option value="10">Class 10</option>
+                <option value="11">Class 11</option>
+                <option value="12">Class 12</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="status-select"><i class="fas fa-info-circle"></i> Status</label>
+              <select id="status-select">
+                <option value="all">All Students</option>
+                <option value="paid">Paid (This Month)</option>
+                <option value="due">Due (This Month)</option>
+              </select>
+            </div>
+            <div class="form-group" style="align-self:flex-end;">
+              <button id="download-btn" class="btn-primary">
+                <i class="fas fa-download"></i> Download PDF
+              </button>
+            </div>
+          </div>
+          <div class="text-small">
+            <i class="fas fa-info-circle"></i> Status is calculated for <strong>current month</strong> using payment records (monthKey = current YYYY-MM).
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title"><i class="fas fa-list"></i> Preview</h2>
+        <div id="preview-info" class="text-small">
+          <i class="fas fa-info-circle"></i> Select class and status, then click "Download PDF".
+        </div>
+        <div class="preview-card" id="preview-area"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+  <!-- jsPDF for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    // Same config & pattern as your other pages (students/teachers)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCOzfdIXBeh6drFhml4pOFEvPG8xV_Wjzw",
+      authDomain: "school-management-projec-9db7a.firebaseapp.com",
+      projectId: "school-management-projec-9db7a",
+      storageBucket: "school-management-projec-9db7a.firebasestorage.app",
+      messagingSenderId: "975842483778",
+      appId: "1:975842483778:web:d1708792ff56014f3317db",
+      measurementId: "G-1X2Q7LE6G3"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Academic year helpers
+    const ACADEMIC_YEAR_MIN = 2025;
+    const ACADEMIC_YEAR_MAX = 2040;
+    const ACADEMIC_YEAR_STORAGE_KEY = "smsAcademicYear";
+
+    function getDefaultAcademicYear() {
+      const nowYear = new Date().getFullYear();
+      if (nowYear < ACADEMIC_YEAR_MIN) return ACADEMIC_YEAR_MIN;
+      if (nowYear > ACADEMIC_YEAR_MAX) return ACADEMIC_YEAR_MAX;
+      return nowYear;
+    }
+
+    function getSelectedAcademicYear() {
+      let year = parseInt(localStorage.getItem(ACADEMIC_YEAR_STORAGE_KEY), 10);
+      if (!year || year < ACADEMIC_YEAR_MIN || year > ACADEMIC_YEAR_MAX) {
+        year = getDefaultAcademicYear();
+        localStorage.setItem(ACADEMIC_YEAR_STORAGE_KEY, String(year));
+      }
+      return String(year);
+    }
+
+    const appContainer = document.getElementById("app");
+    const logoutBtn = document.getElementById("logout-btn");
+    const pageWelcome = document.getElementById("page-welcome");
+
+    const classSelect = document.getElementById("class-select");
+    const statusSelect = document.getElementById("status-select");
+    const downloadBtn = document.getElementById("download-btn");
+
+    const previewArea = document.getElementById("preview-area");
+    const previewInfo = document.getElementById("preview-info");
+    const notificationContainer = document.getElementById("notification-container");
+
+    let currentUserUid = null;
+
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        currentUserUid = user.uid;
+        appContainer.classList.remove("hidden");
+        if (pageWelcome) {
+          pageWelcome.innerHTML = '<i class="fas fa-user-circle"></i> Welcome, ' + (user.email || 'Admin');
+        }
+      } else {
+        currentUserUid = null;
+        window.location.href = "login.html";
+      }
+    });
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        auth.signOut().then(() => {
+          currentUserUid = null;
+          window.location.href = "login.html";
+        });
+      });
+    }
+
+    function showNotification(message, type = "success") {
+      const div = document.createElement("div");
+      div.className = `notification notification-${type}`;
+      const iconClass =
+        type === "success" ? "fa-check-circle" :
+        type === "error" ? "fa-exclamation-circle" :
+        "fa-exclamation-triangle";
+
+      div.innerHTML = `
+        <i class="fas ${iconClass}"></i>
+        <div>${message}</div>
+      `;
+      notificationContainer.innerHTML = "";
+      notificationContainer.appendChild(div);
+
+      setTimeout(() => {
+        if (div.parentNode) {
+          div.parentNode.removeChild(div);
+        }
+      }, 4000);
+    }
+
+    function getCurrentYearMonthKey() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      return `${y}-${m}`; // "YYYY-MM"
+    }
+
+    function formatMonthYear(year, month) {
+      const m = parseInt(month, 10);
+      const names = ["","January","February","March","April","May","June","July","August","September","October","November","December"];
+      if (isNaN(m) || m < 1 || m > 12) return `${year}-${month}`;
+      return `${names[m]} ${year}`;
+    }
+
+    downloadBtn.addEventListener("click", async () => {
+      if (!currentUserUid) {
+        showNotification("Not logged in.", "error");
+        return;
+      }
+
+      const cls = classSelect.value;
+      const status = statusSelect.value; // all | paid | due
+
+      if (!cls) {
+        showNotification("Please select a class.", "warning");
+        return;
+      }
+
+      try {
+        previewArea.innerHTML = `
+          <div class="loading">
+            <div class="spinner"></div>
+          </div>
+        `;
+        previewInfo.textContent = "Loading students and payments.";
+
+        const monthKey = getCurrentYearMonthKey();
+        const academicYear = getSelectedAcademicYear();
+
+        // 1) Load all students in this class for this admin & academic year
+        const studentsSnap = await db.collection("students")
+          .where("ownerId", "==", currentUserUid)
+          .where("academicYear", "==", academicYear)
+          .where("studentClass", "==", String(cls))
+          .get();
+
+        const students = [];
+        studentsSnap.forEach(doc => {
+          const data = doc.data();
+          students.push({
+            id: doc.id,
+            name: data.name || "",
+            fatherName: data.fatherName || "",
+            studentClass: data.studentClass || "",
+            section: data.section || "",
+            mobile: data.mobile || "",
+            gender: data.gender || "",
+            address: data.address || "",
+            dateOfAdmission: data.dateOfAdmission || "",
+            admissionFee: data.admissionFee || ""
+          });
+        });
+
+        if (students.length === 0) {
+          previewArea.innerHTML = "";
+          previewInfo.textContent = "No students found in this class.";
+          showNotification("No students found in this class.", "warning");
+          return;
+        }
+
+        // 2) Load all payments for this class+month+year for this admin
+        const paymentsSnap = await db.collection("payments")
+          .where("ownerId", "==", currentUserUid)
+          .where("academicYear", "==", academicYear)
+          .where("studentClass", "==", String(cls))
+          .where("monthKey", "==", monthKey)
+          .get();
+
+        const paidSet = new Set();
+        paymentsSnap.forEach(doc => {
+          const data = doc.data();
+          if (data.studentId) {
+            paidSet.add(data.studentId);
+          }
+        });
+
+        const monthLabel = formatMonthYear(monthKey.substring(0,4), monthKey.substring(5,7));
+
+        // 3) Determine status for each student & filter
+        const rows = [];
+        students.forEach((s) => {
+          const isPaid = paidSet.has(s.id);
+          const st = isPaid ? "paid" : "due";
+          if (status === "all" || status === st) {
+            rows.push({
+              ...s,
+              status: st
+            });
+          }
+        });
+
+        if (rows.length === 0) {
+          previewArea.innerHTML = "";
+          previewInfo.textContent = "No students match this filter.";
+          showNotification("No students match this filter (for current month).", "warning");
+          return;
+        }
+
+        // 4) Show preview table
+        let html = `
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Father Name</th>
+                <th>Class</th>
+                <th>Section</th>
+                <th>Mobile</th>
+                <th>Status (${monthLabel})</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+        rows.forEach((s, i) => {
+          const badgeClass = s.status === "paid" ? "status-paid" : "status-due";
+          const badgeText = s.status === "paid" ? "PAID" : "DUE";
+          const iconClass = s.status === "paid" ? "fa-check-circle" : "fa-exclamation-circle";
+          html += `
+            <tr>
+              <td>${i + 1}</td>
+              <td>${s.name}</td>
+              <td>${s.fatherName}</td>
+              <td>${s.studentClass}</td>
+              <td>${s.section || "-"}</td>
+              <td>${s.mobile || "-"}</td>
+              <td>
+                <span class="status-badge ${badgeClass}">
+                  <i class="fas ${iconClass}"></i> ${badgeText}
+                </span>
+              </td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table>`;
+        previewArea.innerHTML = html;
+
+        previewInfo.textContent =
+          `Preview: Class ${cls}, Status = ${status.toUpperCase()}, Month = ${monthLabel}, Academic Year = ${academicYear}.`;
+
+        // 5) Generate PDF via jsPDF when ready
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        let y = 10;
+
+        doc.setFontSize(14);
+        doc.text(`Student Fee Status - Class ${cls}`, 10, y);
+        y += 6;
+        doc.setFontSize(10);
+        doc.text(`Month: ${monthLabel} | Academic Year: ${academicYear}`, 10, y);
+        y += 4;
+        doc.text(`Status filter: ${status.toUpperCase()}`, 10, y);
+        y += 6;
+
+        rows.forEach((s, i) => {
+          const line = `${i + 1}. ${s.name} (${s.fatherName}) - Class ${s.studentClass}${s.section ? "-" + s.section : ""} | ${s.mobile || "-"} | ${s.status.toUpperCase()}`;
+          doc.text(line, 10, y);
+          y += 5;
+          if (y > 280) {
+            doc.addPage();
+            y = 10;
+          }
+        });
+
+        doc.save(`students_class_${cls}_status_${status}_${monthKey}_AY${academicYear}.pdf`);
+        showNotification("PDF downloaded successfully.", "success");
+      } catch (err) {
+        console.error("Download error:", err);
+        previewArea.innerHTML = "";
+        previewInfo.textContent = "Failed to load data.";
+        showNotification("Failed to generate PDF: " + err.message, "error");
+      }
+    });
+  </script>
+</body>
+</html>

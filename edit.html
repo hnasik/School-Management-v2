@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Edit Student | School Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url("https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5?q=80&w=870&auto=format&fit=crop")
+        center/cover;
+      opacity: 0.1;
+      z-index: -1;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #app {
+      min-height: 100vh;
+      display: flex;
+      backdrop-filter: blur(5px);
+    }
+
+    .sidebar {
+      width: 260px;
+      background: linear-gradient(180deg, #4a148c, #7b1fa2, #9c27b0);
+      color: #ecf0f1;
+      padding: 2rem 1rem;
+      box-shadow: 3px 0 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 2rem;
+      font-size: 1.5rem;
+      text-align: center;
+      color: #fff;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .sidebar h2 i {
+      font-size: 1.8rem;
+      color: #e1bee7;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      font-size: 1rem;
+      text-decoration: none;
+      color: #ecf0f1;
+      transition: all 0.3s ease;
+      gap: 10px;
+    }
+
+    .nav-link i {
+      width: 20px;
+      text-align: center;
+    }
+
+    .nav-link.active,
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+    }
+
+    .nav-link.active {
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .logout-btn {
+      margin-top: 2rem;
+      background: #d32f2f;
+      text-align: center;
+    }
+
+    .logout-btn:hover {
+      background: #b71c1c;
+    }
+
+    .main {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 1.5rem 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .topbar h1 {
+      font-size: 1.8rem;
+      color: #4a148c;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .topbar h1 i {
+      color: #9c27b0;
+      font-size: 2rem;
+    }
+
+    .section {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      margin-top: 1.5rem;
+    }
+
+    .section-title {
+      margin-bottom: 1.5rem;
+      font-size: 1.4rem;
+      color: #4a148c;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title i {
+      color: #9c27b0;
+      font-size: 1.5rem;
+    }
+
+    .class-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .class-card {
+      border-radius: 16px;
+      padding: 1.2rem 1rem;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .class-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+    }
+
+    .class-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.7),
+        rgba(255, 255, 255, 0.1)
+      );
+    }
+
+    .class-card-title {
+      font-weight: 600;
+      color: #fff;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .class-card-sub {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Individual class card colors (same style as ID card page) */
+    .class-card[data-class="1"] {
+      background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+    }
+    .class-card[data-class="2"] {
+      background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    }
+    .class-card[data-class="3"] {
+      background: linear-gradient(135deg, #45b7d1, #2196f3);
+    }
+    .class-card[data-class="4"] {
+      background: linear-gradient(135deg, #f7b731, #f79f1f);
+    }
+    .class-card[data-class="5"] {
+      background: linear-gradient(135deg, #5f27cd, #341f97);
+    }
+    .class-card[data-class="6"] {
+      background: linear-gradient(135deg, #00d2d3, #00a8b5);
+    }
+    .class-card[data-class="7"] {
+      background: linear-gradient(135deg, #fc5c65, #eb3b5a);
+    }
+    .class-card[data-class="8"] {
+      background: linear-gradient(135deg, #fd79a8, #fdcb6e);
+    }
+    .class-card[data-class="9"] {
+      background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    }
+    .class-card[data-class="10"] {
+      background: linear-gradient(135deg, #00b894, #00cec9);
+    }
+    .class-card[data-class="11"] {
+      background: linear-gradient(135deg, #e17055, #fab1a0);
+    }
+    .class-card[data-class="12"] {
+      background: linear-gradient(135deg, #74b9ff, #a29bfe);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: 20px;
+      padding: 1.5rem 2rem;
+      max-width: 800px;
+      width: 90%;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .modal-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #4a148c;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-title i {
+      color: #9c27b0;
+    }
+
+    .modal-close {
+      border: none;
+      background: transparent;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #9e9e9e;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+      color: #4a148c;
+      background: rgba(156, 39, 176, 0.1);
+    }
+
+    .modal-body {
+      overflow-y: auto;
+    }
+
+    .modal-body table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .modal-body th,
+    .modal-body td {
+      padding: 0.7rem 0.6rem;
+      border-bottom: 1px solid #f0f0f0;
+      text-align: left;
+    }
+
+    .modal-body th {
+      background: linear-gradient(135deg, #4a148c, #7b1fa2);
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .info-text {
+      font-size: 0.85rem;
+      color: #6a1b9a;
+      margin-bottom: 0.6rem;
+      font-weight: 500;
+    }
+
+    .btn-small {
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: linear-gradient(135deg, #4a148c, #7b1fa2);
+      color: #fff;
+      box-shadow: 0 4px 8px rgba(74, 20, 140, 0.2);
+      transition: all 0.2s ease;
+    }
+
+    .btn-small:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(74, 20, 140, 0.3);
+    }
+
+    /* Optional: slightly different color for delete button */
+    .btn-small.btn-delete {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      box-shadow: 0 4px 8px rgba(220, 38, 38, 0.25);
+    }
+
+    .btn-small.btn-delete:hover {
+      box-shadow: 0 6px 12px rgba(220, 38, 38, 0.35);
+    }
+
+    .edit-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+    }
+
+    .form-group label {
+      color: #4a148c;
+      font-weight: 500;
+    }
+
+    .form-group input[type="text"] {
+      padding: 0.65rem 0.9rem;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      font-size: 0.9rem;
+      outline: none;
+      background: #fafafa;
+      transition: all 0.2s ease;
+    }
+
+    .form-group input[type="text"]:focus {
+      border-color: #9c27b0;
+      box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.18);
+      background: #fff;
+    }
+
+    .edit-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.7rem;
+      margin-top: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-secondary {
+      padding: 0.7rem 1.3rem;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 500;
+    }
+
+    .btn-primary {
+      padding: 0.7rem 1.4rem;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: linear-gradient(135deg, #4a148c, #7b1fa2);
+      color: #fff;
+      font-weight: 500;
+      box-shadow: 0 4px 10px rgba(74, 20, 140, 0.35);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(74, 20, 140, 0.45);
+    }
+
+    @media (max-width: 768px) {
+      #app {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+        padding: 1rem;
+      }
+
+      .sidebar h2 {
+        display: none;
+      }
+
+      .nav-link {
+        margin-right: 0.5rem;
+        white-space: nowrap;
+      }
+
+      .logout-btn {
+        margin-left: auto;
+      }
+
+      .class-card-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar">
+    <h2><i class="fas fa-graduation-cap"></i> School Panel</h2>
+
+    <a href="index.html" class="nav-link">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+
+    <a href="student.html" class="nav-link">
+      <i class="fas fa-user-graduate"></i> Students
+    </a>
+
+    <a href="teacher.html" class="nav-link">
+      <i class="fas fa-chalkboard-teacher"></i> Teachers
+    </a>
+
+    <a href="id-card.html" class="nav-link">
+      <i class="fas fa-id-card"></i> ID Card
+    </a>
+
+    <a href="book-delivery-report.html" class="nav-link">
+      <i class="fas fa-book-open"></i> Book Delivery Report
+    </a>
+<a href="admit_card.html" class="nav-link">
+  <i class="fas fa-id-card"></i> Admit Card
+</a>
+<a href="marksheet.html" class="nav-link">
+  <i class="fas fa-file-alt"></i> Marksheet
+</a>
+
+
+    
+       <a href="payment-history.html" class="nav-link active">
+      <i class="fas fa-history"></i> Payment History
+    </a>
+
+    <a href="settle-due.html" class="nav-link">
+      <i class="fas fa-rupee-sign"></i> Settle Due Amount
+    </a>
+
+    <a href="download.html" class="nav-link">
+      <i class="fas fa-download"></i> Download
+    </a>
+<a href="print.html" class="nav-link">
+  <i class="fas fa-print"></i> Print Admission
+</a>
+
+    <!-- NEW: Edit page link (after Download) -->
+    <a href="edit.html" class="nav-link active">
+      <i class="fas fa-pen-to-square"></i> Edit Student
+    </a>
+
+    <div class="nav-link logout-btn" id="logout-btn">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h1><i class="fas fa-user-edit"></i> Edit Student Details</h1>
+      <span style="font-size:0.95rem; color:#6a1b9a; font-weight:500;">
+        Select a class, then edit any student's full details.
+      </span>
+    </div>
+
+    <section class="section">
+      <h2 class="section-title">
+        <i class="fas fa-layer-group"></i> Students by Class
+      </h2>
+      <p class="info-text">
+        Tap a class card to load students (from Firestore) for the current academic year, then click <strong>Edit</strong> on any row.
+      </p>
+
+      <div class="class-card-grid">
+        <div class="class-card" data-class="1">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 1</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="2">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 2</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="3">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 3</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="4">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 4</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="5">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 5</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="6">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 6</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="7">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 7</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="8">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 8</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="9">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 9</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="10">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 10</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="11">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 11</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+        <div class="class-card" data-class="12">
+          <div class="class-card-title"><i class="fas fa-layer-group"></i> Class 12</div>
+          <div class="class-card-sub">Tap to view students</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal: list students for selected class -->
+<div id="student-modal" class="modal-overlay hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">
+        <i class="fas fa-users"></i>
+        <span id="student-modal-title">Class Students</span>
+      </div>
+      <button id="student-modal-close" class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p id="student-modal-sub" class="info-text"></p>
+      <table>
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>Student</th>
+          <th>Roll</th>
+          <th>Action</th>
+        </tr>
+        </thead>
+        <tbody id="student-table-body">
+        <!-- rows injected via JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: edit individual student -->
+<div id="edit-modal" class="modal-overlay hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">
+        <i class="fas fa-pen-to-square"></i>
+        <span id="edit-modal-title">Edit Student</span>
+      </div>
+      <button id="edit-modal-close" class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="info-text">
+        All fields below come directly from this student's Firestore document. Edit and click <strong>Save Changes</strong>.
+      </p>
+      <div id="edit-form-fields" class="edit-form-grid">
+        <!-- dynamic inputs -->
+      </div>
+
+      <div class="edit-modal-footer">
+        <button type="button" class="btn-secondary" id="edit-cancel-btn">
+          Cancel
+        </button>
+        <button type="button" class="btn-primary" id="edit-save-btn">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
+
+<!-- Page logic -->
+<script src="edit.js"></script>
+</body>
+</html>

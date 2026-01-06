@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Teachers | School Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Updated: Date of Joining + Amount -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body { 
+      background: #1A2A6C;
+      color: #333;
+      min-height: 100vh;
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: url('https://images.unsplash.com/photo-1581078426770-6d336e5de7bf?auto=format&fit=crop&w=1974') center/cover;
+      opacity: 0.15;
+      z-index: -1;
+    }
+    
+    .hidden { display: none !important; }
+
+    #app { 
+      min-height: 100vh; 
+      display: flex;
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+    
+    /* Loading animation */
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(26, 42, 108, 0.9);
+      z-index: 9999;
+    }
+    
+    .loader-circle {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255, 255, 255, 0.2);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .sidebar {
+      width: 260px; 
+      background: rgba(26, 42, 108, 0.8);
+      backdrop-filter: blur(10px);
+      color: #ecf0f1; 
+      padding: 2rem 1rem;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      z-index: 10;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar h2 { 
+      margin-bottom: 2rem; 
+      font-size: 1.5rem; 
+      text-align: center;
+      color: #ffffff;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar h2 i {
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, #4A90E2, #7B68EE);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      font-size: 1rem;
+      text-decoration: none;
+      color: #ecf0f1;
+      transition: all 0.3s ease;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .nav-link::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, rgba(74, 144, 226, 0.2), rgba(123, 104, 238, 0.2));
+      transition: width 0.3s ease;
+    }
+    
+    .nav-link i {
+      width: 20px;
+      text-align: center;
+      color: #4A90E2;
+      transition: transform 0.3s ease;
+    }
+    
+    .nav-link.active, .nav-link:hover { 
+      color: #ffffff;
+      font-weight: 600;
+    }
+    
+    .nav-link.active::before, .nav-link:hover::before {
+      width: 100%;
+    }
+    
+    .nav-link:hover i {
+      transform: translateX(3px);
+    }
+    
+    .logout-btn { 
+      margin-top: 2rem; 
+      color: #FF6B6B;
+      font-weight: 600;
+    }
+    
+    .logout-btn i {
+      color: #FF6B6B;
+    }
+    
+    .logout-btn:hover { 
+      color: #FF5252;
+    }
+    
+    .logout-btn:hover i {
+      transform: translateX(3px);
+    }
+
+    .main { 
+      flex: 1; 
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    
+    .topbar {
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, rgba(74, 144, 226, 0.9), rgba(123, 104, 238, 0.9));
+      backdrop-filter: blur(10px);
+      padding: 1.5rem 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .topbar h1 { 
+      font-size: 1.8rem;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+    }
+    
+    .topbar h1 i {
+      color: #ffffff;
+    }
+    
+    #page-welcome {
+      font-weight: 500;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+    }
+    
+    #page-welcome i {
+      color: #ffffff;
+    }
+
+    .section {
+      background: linear-gradient(135deg, rgba(74, 144, 226, 0.9), rgba(123, 104, 238, 0.9));
+      backdrop-filter: blur(10px);
+      padding: 1.5rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    h2.section-title { 
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+    }
+    
+    h2.section-title i {
+      color: #ffffff;
+    }
+
+    .inline-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .inline-form .form-group { 
+      flex: 1 1 200px;
+      margin-bottom: 0;
+    }
+    
+    .form-group { 
+      margin-bottom: 1rem;
+    }
+    
+    label { 
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+      color: #ffffff;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    label i {
+      color: #ffffff;
+    }
+    
+    input[type="text"], input[type="date"], input[type="number"] {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      outline: none;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.9);
+      color: #1A2A6C;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    input:focus { 
+      border-color: #4A90E2;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+      background: #ffffff;
+    }
+
+    .btn {
+      padding: 0.8rem 1.5rem;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn i {
+      font-size: 0.9rem;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #4A90E2, #7B68EE);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(74, 144, 226, 0.4);
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, #2ECC71, #27AE60);
+      color: white;
+    }
+    
+    .btn-secondary:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
+    }
+
+    table { 
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 1rem;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(26, 42, 108, 0.1);
+    }
+    
+    th { 
+      background: linear-gradient(135deg, #4A90E2, #7B68EE);
+      color: white;
+      font-weight: 600;
+    }
+    
+    tr:hover {
+      background: rgba(74, 144, 226, 0.05);
+    }
+    
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .btn-sm {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .btn-danger { 
+      background: linear-gradient(135deg, #FF6B6B, #FF5252);
+      color: white;
+    }
+    
+    .btn-danger:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+    }
+    
+    .btn-sm.btn-neutral {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+      color: #ffffff;
+    }
+    
+    .btn-sm.btn-neutral:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(149, 165, 166, 0.4);
+    }
+
+    /* Teacher payment history styles */
+    .month-block {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .month-block:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .month-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #1A2A6C;
+    }
+    
+    .status-paid {
+      color: #16a34a;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .status-paid i {
+      color: #16a34a;
+    }
+    
+    .status-due {
+      color: #dc2626;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .status-due i {
+      color: #dc2626;
+    }
+    
+    .due-amount-input {
+      width: 120px;
+      padding: 0.4rem 0.6rem;
+      border-radius: 8px;
+      border: 1px solid rgba(26, 42, 108, 0.2);
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.9);
+      transition: all 0.3s ease;
+      color: #1A2A6C;
+    }
+    
+    .due-amount-input:focus {
+      border-color: #4A90E2;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+    }
+    
+    .search-container {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      margin-bottom: 1.5rem;
+    }
+    
+    .search-container .form-group {
+      flex: 1;
+    }
+    
+    .teacher-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1rem;
+      padding: 0.8rem;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .teacher-info i {
+      color: #4A90E2;
+      font-size: 1.2rem;
+    }
+
+    @media (max-width: 768px) {
+      #app { flex-direction: column; }
+      .sidebar { 
+        width: 100%; 
+        display: flex; 
+        overflow-x: auto;
+        padding: 1rem;
+      }
+      .sidebar h2 { 
+        display: none; 
+      }
+      .nav-link { 
+        margin-right: 0.5rem; 
+        white-space: nowrap; 
+      }
+      .logout-btn { 
+        margin-left: auto; 
+      }
+      .inline-form {
+        flex-direction: column;
+      }
+      .inline-form .form-group {
+        flex: 1 1 auto;
+      }
+      .search-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .month-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading animation -->
+  <div class="loader" id="loader">
+    <div class="loader-circle"></div>
+  </div>
+
+  <div id="app" class="hidden">
+   <aside class="sidebar">
+    <h2><i class="fas fa-graduation-cap"></i> School Panel</h2>
+
+    <a href="index.html" class="nav-link">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+
+    <a href="student.html" class="nav-link">
+      <i class="fas fa-user-graduate"></i> Students
+    </a>
+
+    <a href="teacher.html" class="nav-link">
+      <i class="fas fa-chalkboard-teacher"></i> Teachers
+    </a>
+
+    <a href="id-card.html" class="nav-link">
+      <i class="fas fa-id-card"></i> ID Card
+    </a>
+
+    <a href="book-delivery-report.html" class="nav-link">
+      <i class="fas fa-book-open"></i> Book Delivery Report
+    </a>
+<a href="admit_card.html" class="nav-link">
+  <i class="fas fa-id-card"></i> Admit Card
+</a>
+<a href="marksheet.html" class="nav-link">
+  <i class="fas fa-file-alt"></i> Marksheet
+</a>
+
+
+   
+       <a href="payment-history.html" class="nav-link active">
+      <i class="fas fa-history"></i> Payment History
+    </a>
+    <a href="settle-due.html" class="nav-link">
+      <i class="fas fa-rupee-sign"></i> Settle Due Amount
+    </a>
+
+    <a href="download.html" class="nav-link">
+      <i class="fas fa-download"></i> Download
+    </a>
+<a href="print.html" class="nav-link">
+  <i class="fas fa-print"></i> Print Admission
+</a>
+
+    <!-- NEW: Edit page link (after Download) -->
+    <a href="edit.html" class="nav-link active">
+      <i class="fas fa-pen-to-square"></i> Edit Student
+    </a>
+
+    <div class="nav-link logout-btn" id="logout-btn">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </div>
+  </aside>
+
+
+    <main class="main">
+      <div class="topbar">
+        <h1><i class="fas fa-chalkboard-teacher"></i> Teachers</h1>
+        <span id="page-welcome"><i class="fas fa-user-circle"></i> Welcome, Admin</span>
+      </div>
+
+      <section class="section">
+        <h2 class="section-title"><i class="fas fa-users"></i> Teacher List</h2>
+
+        <div class="search-container">
+          <div class="form-group">
+            <label for="teacher-search"><i class="fas fa-search"></i> Search Teacher</label>
+            <input type="text" id="teacher-search" placeholder="Search by name..." />
+          </div>
+          <button id="teacher-search-btn" class="btn btn-primary">
+            <i class="fas fa-search"></i> Search
+          </button>
+        </div>
+
+        <form id="teacher-form" class="inline-form">
+          <div class="form-group">
+            <label for="teacher-name"><i class="fas fa-user"></i> Teacher Name</label>
+            <input type="text" id="teacher-name" required />
+          </div>
+          <div class="form-group">
+            <label for="teacher-subject"><i class="fas fa-book"></i> Subject</label>
+            <input type="text" id="teacher-subject" required />
+          </div>
+          <div class="form-group">
+            <label for="teacher-class"><i class="fas fa-school"></i> Class</label>
+            <input type="text" id="teacher-class" placeholder="e.g. 1, 2, 3..." required />
+          </div>
+          <div class="form-group">
+            <label for="teacher-amount"><i class="fas fa-money-bill-wave"></i> Amount (Monthly Salary)</label>
+            <input type="number" id="teacher-amount" min="0" step="1" placeholder="e.g. 1000" required />
+          </div>
+          <div class="form-group">
+            <label for="teacher-doj"><i class="fas fa-calendar"></i> Date of Joining</label>
+            <input type="date" id="teacher-doj" required />
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Add Teacher
+          </button>
+        </form>
+
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Teacher Name</th>
+              <th>Subject</th>
+              <th>Class</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="teachers-table-body"></tbody>
+        </table>
+      </section>
+
+      <!-- Teacher Payment History Section -->
+      <section id="teacher-payment-section" class="section hidden">
+        <h2 class="section-title"><i class="fas fa-history"></i> Teacher Payment History</h2>
+        <div class="teacher-info">
+          <i class="fas fa-info-circle"></i>
+          <div id="teacher-payment-info">Teacher information will appear here</div>
+        </div>
+        <div id="teacher-payment-history"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Hide loader when page is fully loaded
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('app').classList.remove('hidden');
+      }, 500);
+    });
+  </script>
+
+  <script src="teacher.js"></script>
+</body>
+</html>

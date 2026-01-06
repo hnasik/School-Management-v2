@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Teacher Attendance Scan</title>
+
+<!-- QR Scanner -->
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    text-align: center;
+    padding: 20px;
+  }
+  h2 {
+    margin-bottom: 5px;
+  }
+  #reader {
+    width: 300px;
+    margin: 20px auto;
+  }
+  .msg {
+    margin-top: 15px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .success { color: green; }
+  .error { color: red; }
+</style>
+</head>
+
+<body>
+
+<h2>Scan Attendance QR</h2>
+<p>Point your camera at your QR code</p>
+
+<div id="reader"></div>
+<div id="message" class="msg"></div>
+
+<!-- ================= FIREBASE + APP LOGIC ================= -->
+<script type="module">
+  /* ?? Firebase SDKs (v9 modular) */
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { 
+    getFirestore,
+    doc,
+    setDoc,
+    getDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+  /* ?? Your Firebase Config */
+  const firebaseConfig = {
+    apiKey: "AIzaSyCOzfdIXBeh6drFhml4pOFEvPG8xV_Wjzw",
+    authDomain: "school-management-projec-9db7a.firebaseapp.com",
+    projectId: "school-management-projec-9db7a",
+    storageBucket: "school-management-projec-9db7a.firebasestorage.app",
+    messagingSenderId: "975842483778",
+    appId: "1:975842483778:web:d1708792ff56014f3317db",
+    measurementId: "G-1X2Q7LE6G3"
+  };
+
+  /* ?? Initialize Firebase */
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  /* =====================================================
+     ?? LOGGED-IN TEACHER (REPLACE WITH FIREBASE AUTH LATER)
+  ===================================================== */
+  const loggedInTeacher = {
+    teacherId: "T001",
+    schoolId: "SCH001",
+    qrToken: "X7P9A2"
+  };
+
+  const msg = document.getElementById("message");
+
+  /* =====================================================
+     ?? SAVE ATTENDANCE TO FIRESTORE
+  ===================================================== */
+  async function saveAttendance() {
+    const today = new Date().toISOString().split("T")[0];
+
+    const attendanceRef = doc(
+      db,
+      "attendance",
+      loggedInTeacher.schoolId,
+      today,
+      loggedInTeacher.teacherId
+    );
+
+    // ? Prevent duplicate attendance
+    const alreadyMarked = await getDoc(attendanceRef);
+    if (alreadyMarked.exists()) {
+      msg.textContent = "?? Attendance already marked today";
+      msg.className = "msg error";
+      return;
+    }
+
+    // ? Save attendance
+    await setDoc(attendanceRef, {
+      teacherId: loggedInTeacher.teacherId,
+      schoolId: loggedInTeacher.schoolId,
+      date: today,
+      status: "Present",
+      method: "QR",
+      createdAt: serverTimestamp()
+    });
+
+    msg.textContent = "? Attendance marked successfully";
+    msg.className = "msg success";
+  }
+
+  /* =====================================================
+     ?? QR SCAN SUCCESS HANDLER
+  ===================================================== */
+  async function onScanSuccess(decodedText) {
+    try {
+      const qrData = JSON.parse(decodedText);
+
+      if (
+        qrData.teacherId === loggedInTeacher.teacherId &&
+        qrData.schoolId === loggedInTeacher.schoolId &&
+        qrData.token === loggedInTeacher.qrToken
+      ) {
+        await saveAttendance();
+        html5QrCode.stop();
+      } else {
+        msg.textContent = "? Invalid QR code";
+        msg.className = "msg error";
+      }
+
+    } catch (e) {
+      msg.textContent = "? Invalid QR format";
+      msg.className = "msg error";
+    }
+  }
+
+  /* =====================================================
+     ?? START CAMERA
+  ===================================================== */
+  const html5QrCode = new Html5Qrcode("reader");
+
+  Html5Qrcode.getCameras().then(cameras => {
+    if (cameras && cameras.length) {
+      html5QrCode.start(
+        cameras[0].id,
+        { fps: 10, qrbox: 250 },
+        onScanSuccess
+      );
+    }
+  }).catch(err => {
+    msg.textContent = "? Camera access denied";
+    msg.className = "msg error";
+  });
+
+</script>
+
+</body>
+</html>

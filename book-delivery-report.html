@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Book Delivery Report | School Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    }
+    
+    body { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+      color: #333; 
+      min-height: 100vh; 
+      position: relative; 
+    }
+    
+    body::before { 
+      content: ''; 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      right: 0; 
+      bottom: 0; 
+      background: url('https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0') center/cover; 
+      opacity: 0.1; 
+      z-index: -1; 
+    }
+    
+    #app { 
+      min-height: 100vh; 
+      display: flex; 
+      backdrop-filter: blur(5px); 
+    }
+    
+    .sidebar { 
+      width: 260px; 
+      background: linear-gradient(180deg, #4a148c, #7b1fa2, #9c27b0); 
+      color: #ecf0f1; 
+      padding: 2rem 1rem; 
+      box-shadow: 3px 0 15px rgba(0,0,0,0.2); 
+      transition: all 0.3s ease; 
+    }
+    
+    .sidebar h2 { 
+      margin-bottom: 2rem; 
+      font-size: 1.5rem; 
+      text-align: center; 
+      color: #fff; 
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.3); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 10px; 
+    }
+    
+    .sidebar h2 i { 
+      font-size: 1.8rem; 
+      color: #e1bee7; 
+    }
+    
+    .nav-link { 
+      display: flex; 
+      align-items: center; 
+      padding: 0.8rem 1rem; 
+      border-radius: 8px; 
+      margin-bottom: 0.5rem; 
+      cursor: pointer; 
+      font-size: 1rem; 
+      text-decoration: none; 
+      color: #ecf0f1; 
+      transition: all 0.3s ease; 
+      gap: 10px; 
+    }
+    
+    .nav-link i { 
+      width: 20px; 
+      text-align: center; 
+    }
+    
+    .nav-link.active, .nav-link:hover { 
+      background: rgba(255, 255, 255, 0.15); 
+      transform: translateX(5px); 
+    }
+    
+    .nav-link.active {
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .logout-btn { 
+      margin-top: 2rem; 
+      background: #d32f2f; 
+      text-align: center; 
+    }
+    
+    .logout-btn:hover { 
+      background: #b71c1c; 
+    }
+    
+    .main { 
+      flex: 1; 
+      padding: 2rem; 
+      overflow-y: auto; 
+    }
+    
+    .topbar { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 2rem; 
+      background: rgba(255, 255, 255, 0.95); 
+      padding: 1.5rem 2rem; 
+      border-radius: 20px; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+    }
+    
+    .topbar h1 { 
+      font-size: 1.8rem; 
+      color: #4a148c; 
+      display: flex; 
+      align-items: center; 
+      gap: 15px; 
+    }
+    
+    .topbar h1 i { 
+      color: #9c27b0; 
+      font-size: 2rem;
+    }
+    
+    .section { 
+      background: rgba(255, 255, 255, 0.95); 
+      padding: 2rem; 
+      border-radius: 20px; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+      margin-top: 1.5rem; 
+    }
+    
+    .section-title { 
+      margin-bottom: 1.5rem; 
+      font-size: 1.4rem; 
+      color: #4a148c; 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+    }
+    
+    .section-title i { 
+      color: #9c27b0; 
+      font-size: 1.5rem;
+    }
+    
+    .class-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+      gap: 1.5rem; 
+    }
+    
+    .class-card { 
+      border-radius: 16px; 
+      padding: 1.5rem 1rem; 
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12); 
+      cursor: pointer; 
+      display:flex; 
+      flex-direction:column; 
+      align-items:center; 
+      justify-content:center; 
+      gap:10px; 
+      transition: transform 0.3s ease, box-shadow 0.3s ease; 
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .class-card:hover { 
+      transform: translateY(-8px); 
+      box-shadow: 0 15px 30px rgba(0,0,0,0.18); 
+    }
+    
+    .class-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.7), rgba(255,255,255,0.1));
+    }
+    
+    .class-card .num { 
+      font-size: 2.2rem; 
+      font-weight:700; 
+      color:#fff; 
+    }
+    
+    .class-card .label { 
+      font-size: 1rem; 
+      color:rgba(255,255,255,0.9); 
+      font-weight: 500;
+    }
+    
+    /* Individual class card colors */
+    .class-card[data-class="1"] { background: linear-gradient(135deg, #FF6B6B, #FF8E53); }
+    .class-card[data-class="2"] { background: linear-gradient(135deg, #4ECDC4, #44A08D); }
+    .class-card[data-class="3"] { background: linear-gradient(135deg, #45B7D1, #2196F3); }
+    .class-card[data-class="4"] { background: linear-gradient(135deg, #F7B731, #F79F1F); }
+    .class-card[data-class="5"] { background: linear-gradient(135deg, #5F27CD, #341F97); }
+    .class-card[data-class="6"] { background: linear-gradient(135deg, #00D2D3, #00A8B5); }
+    .class-card[data-class="7"] { background: linear-gradient(135deg, #FC5C65, #EB3B5A); }
+    .class-card[data-class="8"] { background: linear-gradient(135deg, #FD79A8, #FDCB6E); }
+    .class-card[data-class="9"] { background: linear-gradient(135deg, #6C5CE7, #A29BFE); }
+    .class-card[data-class="10"] { background: linear-gradient(135deg, #00B894, #00CEC9); }
+    .class-card[data-class="11"] { background: linear-gradient(135deg, #E17055, #FAB1A0); }
+    .class-card[data-class="12"] { background: linear-gradient(135deg, #74B9FF, #A29BFE); }
+    
+    /* Modal */
+    .modal-overlay { 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0,0,0,0.6); 
+      display: none; 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 60; 
+      backdrop-filter: blur(5px);
+    }
+    
+    .modal-overlay.show { 
+      display: flex; 
+    }
+    
+    .modal { 
+      background: #fff; 
+      border-radius: 20px; 
+      width: 92%; 
+      max-width: 850px; 
+      max-height: 86vh; 
+      overflow-y: auto; 
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+      padding: 1.5rem; 
+    }
+    
+    .modal .modal-head { 
+      display:flex; 
+      justify-content:space-between; 
+      align-items:center; 
+      padding-bottom:15px; 
+      border-bottom:1px solid #f0f0f0; 
+      margin-bottom:15px; 
+    }
+    
+    .modal .modal-head h3 {
+      color: #4a148c;
+      font-size: 1.3rem;
+    }
+    
+    .modal .modal-head div {
+      color: #6a1b9a;
+    }
+    
+    .modal table { 
+      width:100%; 
+      border-collapse:collapse; 
+      margin-top:15px; 
+    }
+    
+    .modal th, .modal td { 
+      padding:12px 15px; 
+      border-bottom:1px solid #f0f0f0; 
+      text-align:left; 
+    }
+    
+    .modal th {
+      background: linear-gradient(135deg, #4a148c, #7b1fa2);
+      color: white;
+      font-weight: 500;
+    }
+    
+    .action-btn { 
+      padding:8px 12px; 
+      border-radius:8px; 
+      border:none; 
+      cursor:pointer; 
+      font-weight:600; 
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .btn-add { 
+      background: linear-gradient(135deg, #3498db, #2980b9); 
+      color:#fff; 
+      box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+    }
+    
+    .btn-add:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(52, 152, 219, 0.4);
+    }
+    
+    .btn-delivered { 
+      background: linear-gradient(135deg, #10b981, #059669); 
+      color:#fff; 
+      box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-delivered:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4);
+    }
+    
+    .btn-notdel { 
+      background: linear-gradient(135deg, #f43f5e, #e11d48); 
+      color:#fff; 
+      box-shadow: 0 4px 8px rgba(244, 63, 94, 0.3);
+    }
+    
+    .btn-notdel:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(244, 63, 94, 0.4);
+    }
+    
+    .btn-delivered:disabled { 
+      opacity:0.6; 
+      cursor:not-allowed; 
+      transform: none;
+    }
+    
+    #closeClassModal {
+      background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+      color: #4a5568;
+    }
+    
+    #closeClassModal:hover {
+      background: linear-gradient(135deg, #cbd5e0, #a0aec0);
+    }
+    
+    @media (max-width:768px) { 
+      .class-grid { 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 1rem;
+      } 
+      .modal { 
+        width: 96%; 
+      } 
+    }
+  </style>
+</head>
+
+<body>
+<div id="app">
+  <aside class="sidebar">
+    <h2><i class="fas fa-graduation-cap"></i> School Panel</h2>
+
+    <a href="index.html" class="nav-link">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+
+    <a href="student.html" class="nav-link">
+      <i class="fas fa-user-graduate"></i> Students
+    </a>
+
+    <a href="teacher.html" class="nav-link">
+      <i class="fas fa-chalkboard-teacher"></i> Teachers
+    </a>
+
+    <a href="id-card.html" class="nav-link">
+      <i class="fas fa-id-card"></i> ID Card
+    </a>
+
+    <a href="book-delivery-report.html" class="nav-link">
+      <i class="fas fa-book-open"></i> Book Delivery Report
+    </a>
+<a href="admit_card.html" class="nav-link">
+  <i class="fas fa-id-card"></i> Admit Card
+</a>
+<a href="marksheet.html" class="nav-link">
+  <i class="fas fa-file-alt"></i> Marksheet
+</a>
+
+
+    
+       <a href="payment-history.html" class="nav-link active">
+      <i class="fas fa-history"></i> Payment History
+    </a>
+
+    <a href="settle-due.html" class="nav-link">
+      <i class="fas fa-rupee-sign"></i> Settle Due Amount
+    </a>
+
+    <a href="download.html" class="nav-link">
+      <i class="fas fa-download"></i> Download
+    </a>
+<a href="print.html" class="nav-link">
+  <i class="fas fa-print"></i> Print Admission
+</a>
+
+    <!-- NEW: Edit page link (after Download) -->
+    <a href="edit.html" class="nav-link active">
+      <i class="fas fa-pen-to-square"></i> Edit Student
+    </a>
+
+    <div class="nav-link logout-btn" id="logout-btn">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h1><i class="fas fa-book-open"></i> Book Delivery Report</h1>
+      <span style="font-size:0.95rem; color:#6a1b9a; font-weight:500;">
+        Click a class to manage book delivery for that class
+      </span>
+    </div>
+
+    <section class="section">
+      <h2 class="section-title">
+        <i class="fas fa-th-large"></i> Classes
+      </h2>
+
+      <div class="class-grid" id="classGrid">
+        <!-- Cards added by JS -->
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal: Class students -->
+<div class="modal-overlay" id="classModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="classModalTitle">
+    <div class="modal-head">
+      <div>
+        <h3 id="classModalTitle" style="margin:0;">Class X Students</h3>
+        <div id="classModalSub" style="font-size:0.9rem; color:#6a1b9a; margin-top:5px;">List of students</div>
+      </div>
+      <div>
+        <button id="closeClassModal" class="action-btn">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </div>
+    </div>
+
+    <div id="classModalBody">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Roll</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="classModalTableBody">
+          <!-- Filled by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+<script src="book-delivery-report.js"></script>
+</body>
+</html>
